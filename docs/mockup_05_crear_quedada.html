@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MatchUp — Crear Quedada</title>
+<style>
+  :root{
+    --blue-dark:#1E3A5F;--blue-mid:#2E75B6;--blue-light:#EEF4FA;
+    --accent:#F4A300;--bg:#F0F4F8;--white:#FFFFFF;
+    --gray:#6B7280;--radius:10px;--shadow:0 2px 12px rgba(30,58,95,.1);
+    --green:#16A34A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;}
+  body{background:var(--bg);}
+
+  nav{background:var(--blue-dark);padding:0 24px;display:flex;align-items:center;height:60px;gap:24px;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .nav-logo{font-size:22px;font-weight:800;color:white;}
+  .nav-logo span{color:var(--accent);}
+  .back-btn{color:rgba(255,255,255,.8);font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+  .nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+  .avatar{width:36px;height:36px;border-radius:50%;background:var(--blue-mid);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;}
+
+  main{max-width:800px;margin:0 auto;padding:28px 24px;}
+
+  .page-hdr{margin-bottom:24px;}
+  .page-title{font-size:24px;font-weight:700;color:var(--blue-dark);}
+  .page-sub{font-size:14px;color:var(--gray);margin-top:4px;}
+
+  /* Steps indicator */
+  .steps{display:flex;align-items:center;gap:0;margin-bottom:28px;}
+  .step{display:flex;align-items:center;gap:8px;}
+  .step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+  .step.done .step-num{background:var(--green);color:white;}
+  .step.active .step-num{background:var(--blue-dark);color:white;}
+  .step.pending .step-num{background:#E5E7EB;color:var(--gray);}
+  .step-label{font-size:13px;font-weight:600;}
+  .step.active .step-label{color:var(--blue-dark);}
+  .step.done .step-label{color:var(--green);}
+  .step.pending .step-label{color:var(--gray);}
+  .step-line{flex:1;height:2px;background:#E5E7EB;margin:0 8px;}
+  .step-line.done{background:var(--green);}
+  .step-line.active{background:var(--blue-mid);}
+
+  /* Form card */
+  .form-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;}
+  .section-title{font-size:15px;font-weight:700;color:var(--blue-dark);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--blue-light);}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group.full{grid-column:1/-1;}
+  label{font-size:13px;font-weight:600;color:var(--blue-dark);}
+  label .required{color:#EF4444;}
+  input,select,textarea{padding:10px 13px;border:1.5px solid #D1D5DB;border-radius:7px;font-size:14px;color:#111;outline:none;font-family:inherit;transition:border-color .2s;}
+  input:focus,select:focus,textarea:focus{border-color:var(--blue-mid);box-shadow:0 0 0 3px rgba(46,117,182,.1);}
+  textarea{resize:vertical;min-height:80px;}
+  .hint{font-size:11px;color:var(--gray);margin-top:2px;}
+  .input-group{display:flex;gap:8px;}
+  .input-group input{flex:1;}
+  .input-suffix{padding:10px 12px;background:var(--bg);border:1.5px solid #D1D5DB;border-left:none;border-radius:0 7px 7px 0;font-size:13px;color:var(--gray);display:flex;align-items:center;}
+
+  /* Sport selector */
+  .sport-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:8px;}
+  .sport-option{padding:12px 8px;border:2px solid #E5E7EB;border-radius:8px;text-align:center;cursor:pointer;transition:.2s;}
+  .sport-option.selected{border-color:var(--blue-mid);background:var(--blue-light);}
+  .sport-option:hover{border-color:#93C5FD;}
+  .sport-option .ico{font-size:24px;margin-bottom:4px;}
+  .sport-option .name{font-size:11px;font-weight:600;color:var(--blue-dark);}
+
+  /* Visibility toggle */
+  .visibility-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .vis-option{padding:14px;border:2px solid #E5E7EB;border-radius:8px;cursor:pointer;transition:.2s;display:flex;align-items:flex-start;gap:10px;}
+  .vis-option.selected{border-color:var(--blue-mid);background:var(--blue-light);}
+  .vis-icon{font-size:22px;flex-shrink:0;}
+  .vis-title{font-size:13px;font-weight:700;color:var(--blue-dark);margin-bottom:2px;}
+  .vis-desc{font-size:11px;color:var(--gray);}
+  .vis-option .radio{width:16px;height:16px;border-radius:50%;border:2px solid #D1D5DB;margin-top:2px;flex-shrink:0;}
+  .vis-option.selected .radio{border-color:var(--blue-mid);background:var(--blue-mid);}
+
+  /* Level selector */
+  .level-row{display:flex;gap:8px;}
+  .level-btn{width:44px;height:44px;border:2px solid #E5E7EB;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;cursor:pointer;color:var(--gray);transition:.2s;}
+  .level-btn.selected{border-color:var(--blue-mid);background:var(--blue-mid);color:white;}
+  .level-btn:hover{border-color:#93C5FD;}
+
+  /* Preview card */
+  .preview-section{background:var(--blue-light);border-radius:8px;padding:16px;margin-top:20px;}
+  .preview-title{font-size:12px;font-weight:700;color:var(--blue-dark);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+  .preview-content{display:flex;flex-wrap:wrap;gap:8px;}
+  .preview-chip{display:flex;align-items:center;gap:6px;padding:5px 12px;background:white;border-radius:20px;font-size:12px;color:var(--blue-dark);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+
+  /* Action buttons */
+  .form-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #F3F4F6;}
+  .btn-cancel{padding:11px 22px;background:white;color:var(--blue-dark);border:1.5px solid #D1D5DB;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;}
+  .btn-cancel:hover{background:var(--bg);}
+  .btn-save{padding:11px 28px;background:var(--blue-dark);color:white;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;}
+  .btn-save:hover{background:var(--blue-mid);}
+  .btn-publish{padding:11px 28px;background:var(--green);color:white;border:none;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="back-btn">← Volver</div>
+  <div class="nav-logo">Match<span>Up</span></div>
+  <div class="nav-right">
+    <div class="avatar">PG</div>
+  </div>
+</nav>
+
+<main>
+  <div class="page-hdr">
+    <div class="page-title">✏️ Crear nueva quedada</div>
+    <div class="page-sub">Completa los detalles del partido para que otros jugadores puedan apuntarse</div>
+  </div>
+
+  <!-- Steps -->
+  <div class="steps">
+    <div class="step done">
+      <div class="step-num">✓</div>
+      <div class="step-label">Deporte</div>
+    </div>
+    <div class="step-line done"></div>
+    <div class="step active">
+      <div class="step-num">2</div>
+      <div class="step-label">Detalles</div>
+    </div>
+    <div class="step-line active"></div>
+    <div class="step pending">
+      <div class="step-num">3</div>
+      <div class="step-label">Configuración</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step pending">
+      <div class="step-num">4</div>
+      <div class="step-label">Publicar</div>
+    </div>
+  </div>
+
+  <div class="form-card">
+
+    <!-- SPORT -->
+    <div class="section-title">⚽ Deporte</div>
+    <div class="sport-grid" style="margin-bottom:20px">
+      <div class="sport-option selected" onclick="selectSport(this)"><div class="ico">⚽</div><div class="name">Fútbol</div></div>
+      <div class="sport-option" onclick="selectSport(this)"><div class="ico">🏀</div><div class="name">Baloncesto</div></div>
+      <div class="sport-option" onclick="selectSport(this)"><div class="ico">🎾</div><div class="name">Pádel</div></div>
+      <div class="sport-option" onclick="selectSport(this)"><div class="ico">🏐</div><div class="name">Voleibol</div></div>
+      <div class="sport-option" onclick="selectSport(this)"><div class="ico">🏋️</div><div class="name">Running</div></div>
+      <div class="sport-option" onclick="selectSport(this)"><div class="ico">🎱</div><div class="name">Billar</div></div>
+      <div class="sport-option" onclick="selectSport(this)"><div class="ico">🏊</div><div class="name">Natación</div></div>
+      <div class="sport-option" onclick="selectSport(this)"><div class="ico">＋</div><div class="name">Otro</div></div>
+    </div>
+
+    <!-- DETAILS -->
+    <div class="section-title">📋 Detalles del partido</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Título del evento <span class="required">*</span></label>
+        <input type="text" value="Fútbol 7 tarde — Campo Vallecas" placeholder="Ej: Fútbol 7 del martes en Retiro">
+      </div>
+      <div class="form-group">
+        <label>Fecha y hora de inicio <span class="required">*</span></label>
+        <input type="datetime-local" value="2026-04-29T19:00">
+      </div>
+      <div class="form-group">
+        <label>Fecha y hora de fin <span class="required">*</span></label>
+        <input type="datetime-local" value="2026-04-29T21:00">
+      </div>
+      <div class="form-group full">
+        <label>📍 Lugar <span class="required">*</span></label>
+        <input type="text" value="Campo Municipal Vallecas, Av. de la Albufera, Madrid" placeholder="Nombre del lugar o dirección">
+        <span class="hint">Escribe el nombre y selecciona del mapa para fijar coordenadas GPS</span>
+      </div>
+      <div class="form-group">
+        <label>Número total de jugadores <span class="required">*</span></label>
+        <div class="input-group">
+          <input type="number" value="14" min="2" max="50">
+          <div class="input-suffix">jugadores</div>
+        </div>
+        <span class="hint">Incluye a los dos equipos</span>
+      </div>
+      <div class="form-group">
+        <label>Nivel requerido <span class="required">*</span></label>
+        <div class="level-row">
+          <div class="level-btn">1</div>
+          <div class="level-btn">2</div>
+          <div class="level-btn selected">3</div>
+          <div class="level-btn selected">4</div>
+          <div class="level-btn">5</div>
+        </div>
+        <span class="hint">Selecciona uno o varios niveles</span>
+      </div>
+      <div class="form-group full">
+        <label>Descripción</label>
+        <textarea placeholder="Describe el partido, normas, qué traer...">Partido de fútbol 7 en el campo municipal de Vallecas. Buscamos jugadores de nivel medio que quieran echar un partido tranquilo después del trabajo. Traed petos (azul y amarillo).</textarea>
+      </div>
+    </div>
+
+    <!-- VISIBILITY -->
+    <div class="section-title">🔐 Visibilidad</div>
+    <div class="visibility-options" style="margin-bottom:20px">
+      <div class="vis-option selected" onclick="selectVis(this)">
+        <div class="radio"></div>
+        <div>
+          <div class="vis-icon">🌍</div>
+          <div class="vis-title">Pública</div>
+          <div class="vis-desc">Cualquier usuario puede ver y apuntarse a esta quedada</div>
+        </div>
+      </div>
+      <div class="vis-option" onclick="selectVis(this)">
+        <div class="radio"></div>
+        <div>
+          <div class="vis-icon">🔒</div>
+          <div class="vis-title">Privada</div>
+          <div class="vis-desc">Solo las personas que invites podrán ver y unirse</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="preview-section">
+      <div class="preview-title">Vista previa del evento</div>
+      <div class="preview-content">
+        <div class="preview-chip">⚽ Fútbol 7</div>
+        <div class="preview-chip">📅 Mié 29 abr · 19:00–21:00</div>
+        <div class="preview-chip">📍 Campo Municipal Vallecas</div>
+        <div class="preview-chip">👥 14 plazas</div>
+        <div class="preview-chip">📊 Nivel 3-4</div>
+        <div class="preview-chip">🌍 Pública</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button class="btn-cancel">Cancelar</button>
+      <button class="btn-save">Guardar borrador</button>
+      <button class="btn-publish">Publicar partido →</button>
+    </div>
+  </div>
+</main>
+
+<script>
+function selectSport(el) {
+  document.querySelectorAll('.sport-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectVis(el) {
+  document.querySelectorAll('.vis-option').forEach(o => { o.classList.remove('selected'); o.querySelector('.radio').style.background=''; });
+  el.classList.add('selected');
+}
+document.querySelectorAll('.level-btn').forEach(btn => {
+  btn.addEventListener('click', () => btn.classList.toggle('selected'));
+});
+</script>
+</body>
+</html>

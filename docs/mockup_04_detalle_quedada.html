@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MatchUp — Detalle de Quedada</title>
+<style>
+  :root{
+    --blue-dark:#1E3A5F;--blue-mid:#2E75B6;--blue-light:#EEF4FA;
+    --accent:#F4A300;--bg:#F0F4F8;--white:#FFFFFF;
+    --gray:#6B7280;--radius:10px;--shadow:0 2px 12px rgba(30,58,95,.1);
+    --green:#16A34A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;}
+  body{background:var(--bg);}
+
+  nav{background:var(--blue-dark);padding:0 24px;display:flex;align-items:center;height:60px;gap:32px;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .nav-logo{font-size:22px;font-weight:800;color:white;}
+  .nav-logo span{color:var(--accent);}
+  .nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+  .back-btn{color:rgba(255,255,255,.8);font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+  .back-btn:hover{color:white;}
+  .avatar{width:36px;height:36px;border-radius:50%;background:var(--blue-mid);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;}
+
+  main{max-width:1000px;margin:0 auto;padding:28px 24px;display:grid;grid-template-columns:1fr 340px;gap:24px;}
+
+  /* LEFT COL */
+  .card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px;}
+
+  /* Hero */
+  .hero{background:linear-gradient(135deg,var(--blue-dark),var(--blue-mid));padding:28px 28px 24px;color:white;position:relative;}
+  .hero-sport{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;opacity:.85;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+  .sport-ico{font-size:24px;}
+  .hero-title{font-size:24px;font-weight:800;margin-bottom:8px;}
+  .hero-org{font-size:13px;opacity:.8;display:flex;align-items:center;gap:6px;}
+  .status-badge{position:absolute;top:24px;right:24px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;background:rgba(22,163,74,.9);color:white;}
+
+  /* Info grid */
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;}
+  .info-cell{padding:16px 20px;border-right:1px solid #F3F4F6;border-bottom:1px solid #F3F4F6;}
+  .info-cell:nth-child(even){border-right:none;}
+  .info-cell:nth-last-child(-n+2){border-bottom:none;}
+  .info-cell-lbl{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;}
+  .info-cell-val{font-size:14px;font-weight:600;color:var(--blue-dark);}
+  .info-cell-sub{font-size:12px;color:var(--gray);margin-top:2px;}
+
+  /* Description */
+  .desc-section{padding:20px;}
+  .section-title{font-size:14px;font-weight:700;color:var(--blue-dark);margin-bottom:10px;}
+  .desc-text{font-size:14px;color:#374151;line-height:1.7;}
+
+  /* Map mini */
+  .map-mini{height:180px;background:linear-gradient(135deg,#d4e8c2,#b8d4a8);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+  .map-mini-label{background:white;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;color:var(--blue-dark);box-shadow:0 2px 8px rgba(0,0,0,.1);display:flex;align-items:center;gap:6px;}
+  .map-btn{position:absolute;bottom:10px;right:10px;padding:6px 14px;background:var(--blue-dark);color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;}
+
+  /* Comments */
+  .comments-section{padding:20px;}
+  .comment{display:flex;gap:10px;margin-bottom:14px;}
+  .comment-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;}
+  .comment-body{flex:1;}
+  .comment-author{font-size:12px;font-weight:700;color:var(--blue-dark);display:flex;align-items:center;gap:8px;}
+  .comment-time{font-size:11px;color:var(--gray);font-weight:400;}
+  .comment-text{font-size:13px;color:#374151;margin-top:3px;line-height:1.5;}
+  .comment-input-row{display:flex;gap:8px;margin-top:12px;}
+  .comment-input{flex:1;padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:7px;font-size:13px;outline:none;}
+  .comment-input:focus{border-color:var(--blue-mid);}
+  .send-btn{padding:9px 16px;background:var(--blue-dark);color:white;border:none;border-radius:7px;font-size:13px;cursor:pointer;}
+
+  /* RIGHT COL */
+  .right-col{}
+
+  /* Join card */
+  .join-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:20px;}
+  .join-title{font-size:16px;font-weight:700;color:var(--blue-dark);margin-bottom:4px;}
+  .join-sub{font-size:12px;color:var(--gray);margin-bottom:16px;}
+  .plazas-bar{margin-bottom:14px;}
+  .plazas-label{display:flex;justify-content:space-between;font-size:12px;color:var(--gray);margin-bottom:6px;}
+  .plazas-label span:last-child{font-weight:700;color:var(--blue-dark);}
+  .bar-track{height:8px;background:#E5E7EB;border-radius:4px;}
+  .bar-fill{height:100%;border-radius:4px;background:var(--blue-mid);}
+  .btn-join{width:100%;padding:13px;background:var(--green);color:white;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;}
+  .btn-join:hover{background:#15803D;}
+  .join-note{font-size:11px;color:var(--gray);text-align:center;margin-top:8px;}
+
+  /* Participants */
+  .participants-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;}
+  .participant-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F9FAFB;}
+  .participant-item:last-child{border-bottom:none;}
+  .p-avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;}
+  .p-info{flex:1;}
+  .p-name{font-size:13px;font-weight:600;color:var(--blue-dark);}
+  .p-meta{font-size:11px;color:var(--gray);margin-top:1px;}
+  .p-fiab{font-size:11px;font-weight:700;}
+  .fiab-high{color:var(--green);}
+  .fiab-mid{color:#D97706;}
+  .organizer-tag{font-size:10px;background:#FEF3C7;color:#B45309;padding:1px 6px;border-radius:10px;margin-left:6px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="back-btn">← Volver al listado</div>
+  <div class="nav-logo">Match<span>Up</span></div>
+  <div class="nav-right">
+    <div class="avatar">PG</div>
+  </div>
+</nav>
+
+<main>
+  <!-- LEFT -->
+  <div>
+    <!-- Hero -->
+    <div class="card">
+      <div class="hero">
+        <div class="hero-sport"><span class="sport-ico">⚽</span> Fútbol 7</div>
+        <div class="hero-title">Fútbol tarde — Campo Municipal Vallecas</div>
+        <div class="hero-org">Organizado por <strong style="margin-left:4px">Pablo García</strong></div>
+        <div class="status-badge">● Abierta</div>
+      </div>
+      <div class="info-grid">
+        <div class="info-cell">
+          <div class="info-cell-lbl">📅 Fecha y hora</div>
+          <div class="info-cell-val">Miércoles, 29 abr 2026</div>
+          <div class="info-cell-sub">19:00 – 21:00 (2 horas)</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-cell-lbl">📍 Lugar</div>
+          <div class="info-cell-val">Campo Municipal Vallecas</div>
+          <div class="info-cell-sub">Av. de la Albufera, Madrid</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-cell-lbl">👥 Plazas</div>
+          <div class="info-cell-val">8 apuntados / 14 total</div>
+          <div class="info-cell-sub" style="color:var(--green)">✓ 6 plazas disponibles</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-cell-lbl">📊 Nivel</div>
+          <div class="info-cell-val">Intermedio (3 – 4)</div>
+          <div class="info-cell-sub">Partido mixto, sin posiciones fijas</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="card">
+      <div class="desc-section">
+        <div class="section-title">📝 Descripción</div>
+        <p class="desc-text">
+          Partido de fútbol 7 en el campo municipal de Vallecas. Buscamos jugadores de nivel medio que quieran echar un partido tranquilo después del trabajo. Traed petos (azul y amarillo). El campo tiene vestuarios y parking gratuito. Si tienes dudas, comenta aquí abajo.
+        </p>
+      </div>
+    </div>
+
+    <!-- Mini Map -->
+    <div class="card">
+      <div class="map-mini">
+        <div class="map-mini-label">📍 Campo Municipal Vallecas, Madrid</div>
+        <button class="map-btn">Ver en mapa →</button>
+      </div>
+    </div>
+
+    <!-- Comments -->
+    <div class="card">
+      <div class="comments-section">
+        <div class="section-title">💬 Comentarios (4)</div>
+
+        <div class="comment">
+          <div class="comment-avatar" style="background:#2E75B6">PG</div>
+          <div class="comment-body">
+            <div class="comment-author">Pablo García <span class="comment-time">hace 2 días</span></div>
+            <div class="comment-text">¡Hola a todos! Confirmad si venís para reservar el campo a tiempo.</div>
+          </div>
+        </div>
+        <div class="comment">
+          <div class="comment-avatar" style="background:#7C3AED">JM</div>
+          <div class="comment-body">
+            <div class="comment-author">Javier Moreno <span class="comment-time">ayer 18:30</span></div>
+            <div class="comment-text">Yo confirmo, estaré. ¿Llevamos balón o hay uno en el campo?</div>
+          </div>
+        </div>
+        <div class="comment">
+          <div class="comment-avatar" style="background:#D97706">AL</div>
+          <div class="comment-body">
+            <div class="comment-author">Ana López <span class="comment-time">ayer 19:05</span></div>
+            <div class="comment-text">Suelo hay uno, pero mejor traer otro por si acaso 👍</div>
+          </div>
+        </div>
+        <div class="comment">
+          <div class="comment-avatar" style="background:#16A34A">CR</div>
+          <div class="comment-body">
+            <div class="comment-author">Carlos Ruiz <span class="comment-time">hoy 9:00</span></div>
+            <div class="comment-text">Perfecto, yo llevo uno. ¡Nos vemos el miércoles!</div>
+          </div>
+        </div>
+
+        <div class="comment-input-row">
+          <input class="comment-input" type="text" placeholder="Escribe un comentario...">
+          <button class="send-btn">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-col">
+    <!-- Join -->
+    <div class="join-card">
+      <div class="join-title">Unirte a este partido</div>
+      <div class="join-sub">Quedan 6 plazas disponibles</div>
+      <div class="plazas-bar">
+        <div class="plazas-label"><span>Plazas ocupadas</span><span>8 / 14</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:57%"></div></div>
+      </div>
+      <button class="btn-join">✓ Apuntarme al partido</button>
+      <div class="join-note">Puedes desapuntarte hasta 1 h antes del inicio</div>
+    </div>
+
+    <!-- Participants -->
+    <div class="participants-card">
+      <div class="section-title" style="margin-bottom:12px">👥 Participantes (8)</div>
+
+      <div class="participant-item">
+        <div class="p-avatar" style="background:#2E75B6">PG</div>
+        <div class="p-info">
+          <div class="p-name">Pablo García <span class="organizer-tag">Organizador</span></div>
+          <div class="p-meta">Fútbol · Nivel 4 · Portero</div>
+        </div>
+        <div class="p-fiab fiab-high">91%</div>
+      </div>
+      <div class="participant-item">
+        <div class="p-avatar" style="background:#7C3AED">JM</div>
+        <div class="p-info">
+          <div class="p-name">Javier Moreno</div>
+          <div class="p-meta">Fútbol · Nivel 3 · Defensa</div>
+        </div>
+        <div class="p-fiab fiab-high">88%</div>
+      </div>
+      <div class="participant-item">
+        <div class="p-avatar" style="background:#D97706">AL</div>
+        <div class="p-info">
+          <div class="p-name">Ana López</div>
+          <div class="p-meta">Fútbol · Nivel 3 · Centrocampista</div>
+        </div>
+        <div class="p-fiab fiab-high">95%</div>
+      </div>
+      <div class="participant-item">
+        <div class="p-avatar" style="background:#16A34A">CR</div>
+        <div class="p-info">
+          <div class="p-name">Carlos Ruiz</div>
+          <div class="p-meta">Fútbol · Nivel 4 · Delantero</div>
+        </div>
+        <div class="p-fiab fiab-mid">72%</div>
+      </div>
+      <div class="participant-item">
+        <div class="p-avatar" style="background:#DC2626">SS</div>
+        <div class="p-info">
+          <div class="p-name">Sara Sánchez</div>
+          <div class="p-meta">Fútbol · Nivel 3 · Cualquiera</div>
+        </div>
+        <div class="p-fiab fiab-high">100%</div>
+      </div>
+      <div style="text-align:center;margin-top:10px">
+        <span style="font-size:12px;color:var(--blue-mid);cursor:pointer">Ver los 8 participantes →</span>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

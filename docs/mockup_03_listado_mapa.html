@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MatchUp — Explorar quedadas</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+  :root{
+    --blue-dark:#1E3A5F;--blue-mid:#2E75B6;--blue-light:#EEF4FA;
+    --accent:#F4A300;--bg:#F0F4F8;--white:#FFFFFF;
+    --gray:#6B7280;--radius:10px;--shadow:0 2px 12px rgba(30,58,95,.1);
+    --green:#16A34A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;}
+  body{background:var(--bg);height:100vh;display:flex;flex-direction:column;}
+
+  nav{background:var(--blue-dark);padding:0 24px;display:flex;align-items:center;height:60px;gap:32px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .nav-logo{font-size:22px;font-weight:800;color:white;}
+  .nav-logo span{color:var(--accent);}
+  .nav-links{display:flex;gap:8px;flex:1;}
+  .nav-link{padding:6px 14px;color:rgba(255,255,255,.75);border-radius:6px;font-size:14px;cursor:pointer;}
+  .nav-link.active{background:rgba(255,255,255,.12);color:white;}
+  .nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+  .avatar{width:36px;height:36px;border-radius:50%;background:var(--blue-mid);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;}
+
+  .layout{display:flex;flex:1;overflow:hidden;}
+
+  /* ── LEFT PANEL ── */
+  .left-panel{width:380px;flex-shrink:0;display:flex;flex-direction:column;background:var(--white);border-right:1px solid #E5E7EB;overflow:hidden;}
+
+  .search-box{padding:16px;border-bottom:1px solid #F3F4F6;}
+  .search-input{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid #E5E7EB;border-radius:8px;padding:8px 12px;}
+  .search-input input{border:none;background:transparent;outline:none;font-size:14px;flex:1;color:#111;}
+  .search-input span{color:var(--gray);}
+
+  /* Filters */
+  .filters{padding:12px 16px;border-bottom:1px solid #F3F4F6;display:flex;flex-wrap:wrap;gap:8px;}
+  .filter-label{font-size:11px;font-weight:700;color:var(--blue-dark);text-transform:uppercase;letter-spacing:.5px;width:100%;margin-bottom:4px;}
+  select,input[type=range]{font-size:12px;padding:5px 8px;border:1.5px solid #D1D5DB;border-radius:6px;background:white;color:#333;cursor:pointer;outline:none;}
+  select{flex:1;}
+  .range-wrap{display:flex;align-items:center;gap:6px;flex:1;}
+  .range-wrap label{font-size:11px;color:var(--gray);white-space:nowrap;}
+  .range-wrap input{flex:1;}
+  .range-val{font-size:11px;font-weight:600;color:var(--blue-mid);min-width:32px;}
+  .active-filters{display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 10px;}
+  .filter-chip{display:flex;align-items:center;gap:4px;padding:3px 10px;background:var(--blue-light);color:var(--blue-mid);border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;}
+  .filter-chip .remove{font-size:13px;opacity:.7;}
+  .result-count{padding:8px 16px;font-size:12px;color:var(--gray);}
+
+  /* Event list */
+  .event-list{flex:1;overflow-y:auto;padding:8px 12px;}
+  .event-item{background:white;border:1.5px solid #F3F4F6;border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:.15s;}
+  .event-item:hover,.event-item.selected{border-color:var(--blue-mid);box-shadow:0 0 0 3px rgba(46,117,182,.1);}
+  .event-item-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+  .event-item-sport{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--blue-dark);}
+  .dist-badge{font-size:11px;color:var(--gray);background:var(--bg);padding:2px 8px;border-radius:10px;}
+  .event-item-title{font-size:14px;font-weight:600;color:var(--blue-dark);margin-bottom:4px;}
+  .event-item-meta{display:flex;gap:12px;font-size:11px;color:var(--gray);}
+  .event-item-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+  .level-pills{display:flex;gap:4px;}
+  .level-pill{padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;background:#DBEAFE;color:#1D4ED8;}
+  .plazas{font-size:11px;font-weight:600;}
+  .plazas.ok{color:var(--green);}
+  .plazas.warn{color:#D97706;}
+
+  /* ── MAP ── */
+  #map{flex:1;}
+  .leaflet-popup-content-wrapper{border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.15);}
+  .popup-sport{font-size:12px;font-weight:700;color:var(--blue-dark);margin-bottom:4px;}
+  .popup-title{font-size:13px;font-weight:600;margin-bottom:4px;}
+  .popup-meta{font-size:11px;color:var(--gray);}
+  .popup-btn{display:block;margin-top:8px;padding:5px 12px;background:var(--blue-dark);color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;text-align:center;width:100%;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Match<span>Up</span></div>
+  <div class="nav-links">
+    <div class="nav-link active">Explorar</div>
+    <div class="nav-link">Mis Quedadas</div>
+    <div class="nav-link">Mapa</div>
+  </div>
+  <div class="nav-right">
+    <div class="avatar">PG</div>
+  </div>
+</nav>
+
+<div class="layout">
+  <!-- LEFT: Filters + List -->
+  <div class="left-panel">
+    <div class="search-box">
+      <div class="search-input">
+        <span>🔍</span>
+        <input type="text" placeholder="Buscar por deporte, lugar..." value="Madrid">
+      </div>
+    </div>
+    <div class="filters">
+      <span class="filter-label">Filtros</span>
+      <select style="min-width:120px">
+        <option>⚽ Fútbol</option>
+        <option>🏀 Baloncesto</option>
+        <option>🎾 Pádel</option>
+        <option>Todos los deportes</option>
+      </select>
+      <select>
+        <option>Esta semana</option>
+        <option>Hoy</option>
+        <option>Este mes</option>
+      </select>
+      <div class="range-wrap">
+        <label>Dist:</label>
+        <input type="range" min="1" max="50" value="10">
+        <span class="range-val">10km</span>
+      </div>
+      <div class="range-wrap">
+        <label>Nivel:</label>
+        <input type="range" min="1" max="5" value="3">
+        <span class="range-val">≤3</span>
+      </div>
+    </div>
+    <div class="active-filters">
+      <div class="filter-chip">⚽ Fútbol <span class="remove">×</span></div>
+      <div class="filter-chip">≤ 10 km <span class="remove">×</span></div>
+      <div class="filter-chip">Nivel ≤ 3 <span class="remove">×</span></div>
+    </div>
+    <div class="result-count">Se muestran <strong>18 quedadas</strong> cerca de tu ubicación</div>
+
+    <div class="event-list">
+      <!-- Item 1 - selected -->
+      <div class="event-item selected">
+        <div class="event-item-header">
+          <div class="event-item-sport">⚽ Fútbol 7</div>
+          <span class="dist-badge">📍 1.2 km</span>
+        </div>
+        <div class="event-item-title">Fútbol tarde — Campo Vallecas</div>
+        <div class="event-item-meta">
+          <span>📅 Mié 29 abr · 19:00</span>
+          <span>⏱ 2 horas</span>
+        </div>
+        <div class="event-item-footer">
+          <div class="level-pills"><div class="level-pill">Nivel 3</div><div class="level-pill">Nivel 4</div></div>
+          <span class="plazas ok">✓ 6 plazas libres</span>
+        </div>
+      </div>
+      <!-- Item 2 -->
+      <div class="event-item">
+        <div class="event-item-header">
+          <div class="event-item-sport">⚽ Fútbol 5</div>
+          <span class="dist-badge">📍 2.4 km</span>
+        </div>
+        <div class="event-item-title">Fútbol rápido — Polideportivo Hortaleza</div>
+        <div class="event-item-meta">
+          <span>📅 Jue 30 abr · 20:30</span>
+          <span>⏱ 1.5 h</span>
+        </div>
+        <div class="event-item-footer">
+          <div class="level-pills"><div class="level-pill">Nivel 2</div></div>
+          <span class="plazas warn">⚠ 2 plazas libres</span>
+        </div>
+      </div>
+      <!-- Item 3 -->
+      <div class="event-item">
+        <div class="event-item-header">
+          <div class="event-item-sport">🏀 Baloncesto</div>
+          <span class="dist-badge">📍 3.1 km</span>
+        </div>
+        <div class="event-item-title">3x3 Retiro — Pistas exteriores</div>
+        <div class="event-item-meta">
+          <span>📅 Sáb 3 may · 17:00</span>
+          <span>⏱ 1.5 h</span>
+        </div>
+        <div class="event-item-footer">
+          <div class="level-pills"><div class="level-pill">Nivel 3</div></div>
+          <span class="plazas ok">✓ 4 plazas libres</span>
+        </div>
+      </div>
+      <!-- Item 4 -->
+      <div class="event-item">
+        <div class="event-item-header">
+          <div class="event-item-sport">🎾 Pádel</div>
+          <span class="dist-badge">📍 4.8 km</span>
+        </div>
+        <div class="event-item-title">Pádel mixto — Club Norte</div>
+        <div class="event-item-meta">
+          <span>📅 Dom 4 may · 10:00</span>
+          <span>⏱ 2 h</span>
+        </div>
+        <div class="event-item-footer">
+          <div class="level-pills"><div class="level-pill">Nivel 3</div></div>
+          <span class="plazas ok">✓ 2 plazas libres</span>
+        </div>
+      </div>
+      <!-- Item 5 -->
+      <div class="event-item">
+        <div class="event-item-header">
+          <div class="event-item-sport">⚽ Fútbol 11</div>
+          <span class="dist-badge">📍 6.0 km</span>
+        </div>
+        <div class="event-item-title">Fútbol 11 — Ciudad Deportiva Moratalaz</div>
+        <div class="event-item-meta">
+          <span>📅 Dom 4 may · 11:00</span>
+          <span>⏱ 2 h</span>
+        </div>
+        <div class="event-item-footer">
+          <div class="level-pills"><div class="level-pill">Nivel 2</div><div class="level-pill">Nivel 3</div></div>
+          <span class="plazas ok">✓ 8 plazas libres</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Map -->
+  <div id="map"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map = L.map('map').setView([40.4168, -3.7038], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap'
+}).addTo(map);
+
+const iconSvg = (emoji, selected) => L.divIcon({
+  html: `<div style="
+    width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);
+    background:${selected?'#1E3A5F':'#2E75B6'};
+    border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.25);
+    display:flex;align-items:center;justify-content:center;">
+    <span style="transform:rotate(45deg);font-size:16px">${emoji}</span>
+  </div>`,
+  className:'', iconSize:[38,38], iconAnchor:[19,38]
+});
+
+const events = [
+  {lat:40.406, lng:-3.678, emoji:'⚽', title:'Fútbol tarde — Vallecas',     date:'Mié 29 abr · 19:00', plazas:'6 libres', selected:true},
+  {lat:40.449, lng:-3.665, emoji:'⚽', title:'Fútbol rápido — Hortaleza',   date:'Jue 30 abr · 20:30', plazas:'2 libres', selected:false},
+  {lat:40.415, lng:-3.685, emoji:'🏀', title:'3x3 Retiro',                  date:'Sáb 3 may · 17:00',  plazas:'4 libres', selected:false},
+  {lat:40.467, lng:-3.720, emoji:'🎾', title:'Pádel mixto — Club Norte',    date:'Dom 4 may · 10:00',  plazas:'2 libres', selected:false},
+  {lat:40.390, lng:-3.645, emoji:'⚽', title:'Fútbol 11 — Moratalaz',       date:'Dom 4 may · 11:00',  plazas:'8 libres', selected:false},
+];
+
+events.forEach(ev => {
+  const marker = L.marker([ev.lat, ev.lng], {icon: iconSvg(ev.emoji, ev.selected)}).addTo(map);
+  marker.bindPopup(`
+    <div style="min-width:180px">
+      <div class="popup-sport">${ev.emoji} ${ev.title.split('—')[0].trim()}</div>
+      <div class="popup-title">${ev.title}</div>
+      <div class="popup-meta">📅 ${ev.date}</div>
+      <div class="popup-meta" style="margin-top:2px">👥 ${ev.plazas}</div>
+      <button class="popup-btn" onclick="alert('Ir al detalle')">Ver detalle →</button>
+    </div>
+  `);
+  if (ev.selected) marker.openPopup();
+});
+</script>
+</body>
+</html>

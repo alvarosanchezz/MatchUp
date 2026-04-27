@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MatchUp — Perfil de Usuario</title>
+<style>
+  :root{
+    --blue-dark:#1E3A5F;--blue-mid:#2E75B6;--blue-light:#EEF4FA;
+    --accent:#F4A300;--bg:#F0F4F8;--white:#FFFFFF;
+    --gray:#6B7280;--radius:10px;--shadow:0 2px 12px rgba(30,58,95,.1);
+    --green:#16A34A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;}
+  body{background:var(--bg);}
+
+  nav{background:var(--blue-dark);padding:0 24px;display:flex;align-items:center;height:60px;gap:24px;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .nav-logo{font-size:22px;font-weight:800;color:white;}
+  .nav-logo span{color:var(--accent);}
+  .nav-links{display:flex;gap:8px;flex:1;}
+  .nav-link{padding:6px 14px;color:rgba(255,255,255,.75);border-radius:6px;font-size:14px;cursor:pointer;}
+  .nav-link.active{background:rgba(255,255,255,.12);color:white;}
+  .nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+  .avatar-nav{width:36px;height:36px;border-radius:50%;background:var(--blue-mid);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;border:2px solid rgba(255,255,255,.3);}
+
+  main{max-width:1000px;margin:0 auto;padding:28px 24px;display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start;}
+
+  /* LEFT — Profile card */
+  .profile-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+  .profile-banner{height:80px;background:linear-gradient(135deg,var(--blue-dark),var(--blue-mid));}
+  .profile-body{padding:0 20px 20px;position:relative;}
+  .avatar-wrap{position:relative;width:72px;margin-top:-36px;margin-bottom:12px;}
+  .profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--blue-mid);border:3px solid white;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:white;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+  .edit-avatar{position:absolute;bottom:0;right:0;width:22px;height:22px;background:var(--blue-dark);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:white;cursor:pointer;border:2px solid white;}
+  .profile-name{font-size:18px;font-weight:800;color:var(--blue-dark);}
+  .profile-email{font-size:12px;color:var(--gray);margin-top:2px;}
+  .profile-location{font-size:12px;color:var(--gray);display:flex;align-items:center;gap:4px;margin-top:4px;}
+  .profile-since{font-size:11px;color:var(--gray);margin-top:2px;}
+
+  /* Fiabilidad big */
+  .fiab-big{background:var(--blue-light);border-radius:8px;padding:14px;margin:14px 0;text-align:center;}
+  .fiab-big-num{font-size:36px;font-weight:900;color:var(--green);}
+  .fiab-big-lbl{font-size:11px;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:2px;}
+  .fiab-big-sub{font-size:11px;color:var(--gray);margin-top:4px;}
+
+  /* Mini stats */
+  .mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+  .mini-stat{background:var(--bg);border-radius:7px;padding:10px;text-align:center;}
+  .mini-stat-val{font-size:18px;font-weight:800;color:var(--blue-dark);}
+  .mini-stat-lbl{font-size:10px;color:var(--gray);}
+
+  .btn-edit-profile{width:100%;padding:10px;background:var(--blue-dark);color:white;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px;}
+  .btn-edit-profile:hover{background:var(--blue-mid);}
+
+  /* RIGHT col */
+  .card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:20px;}
+  .section-title{font-size:15px;font-weight:700;color:var(--blue-dark);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+  .section-title-txt{display:flex;align-items:center;gap:8px;}
+  .add-link{font-size:12px;color:var(--blue-mid);cursor:pointer;font-weight:600;}
+
+  /* Sports list */
+  .sport-row{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #F3F4F6;}
+  .sport-row:last-child{border-bottom:none;}
+  .sport-icon-wrap{width:40px;height:40px;border-radius:10px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .sport-info{flex:1;}
+  .sport-name{font-size:14px;font-weight:700;color:var(--blue-dark);}
+  .sport-role{font-size:12px;color:var(--gray);margin-top:1px;}
+  .level-stars{display:flex;gap:3px;}
+  .star{width:18px;height:18px;border-radius:3px;background:#E5E7EB;display:flex;align-items:center;justify-content:center;font-size:10px;}
+  .star.filled{background:var(--accent);}
+  .sport-actions{display:flex;gap:6px;}
+  .sport-btn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;}
+  .sport-btn.edit{background:var(--blue-light);color:var(--blue-mid);}
+  .sport-btn.del{background:#FEE2E2;color:#B91C1C;}
+
+  /* Ratings radar */
+  .ratings-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .rating-stat{text-align:center;}
+  .rating-circle{width:70px;height:70px;border-radius:50%;margin:0 auto 8px;background:conic-gradient(var(--blue-mid) calc(var(--pct)*1%),#E5E7EB 0);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--blue-dark);}
+  .rating-inner{width:52px;height:52px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--blue-dark);}
+  .rating-lbl{font-size:12px;color:var(--gray);}
+  .rating-sub{font-size:10px;color:var(--gray);margin-top:2px;}
+
+  /* Recent matches */
+  .match-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F9FAFB;}
+  .match-item:last-child{border-bottom:none;}
+  .match-sport{width:36px;height:36px;border-radius:8px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .match-info{flex:1;}
+  .match-title{font-size:13px;font-weight:600;color:var(--blue-dark);}
+  .match-meta{font-size:11px;color:var(--gray);margin-top:2px;}
+  .match-status{padding:3px 9px;border-radius:12px;font-size:10px;font-weight:700;}
+  .status-conf{background:#DCFCE7;color:#15803D;}
+  .status-done{background:#F3F4F6;color:#6B7280;}
+  .status-miss{background:#FEE2E2;color:#B91C1C;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Match<span>Up</span></div>
+  <div class="nav-links">
+    <div class="nav-link">Explorar</div>
+    <div class="nav-link">Mis Quedadas</div>
+    <div class="nav-link active">Perfil</div>
+  </div>
+  <div class="nav-right">
+    <div class="avatar-nav">PG</div>
+  </div>
+</nav>
+
+<main>
+  <!-- LEFT -->
+  <div>
+    <div class="profile-card">
+      <div class="profile-banner"></div>
+      <div class="profile-body">
+        <div class="avatar-wrap">
+          <div class="profile-avatar">PG</div>
+          <div class="edit-avatar">✏</div>
+        </div>
+        <div class="profile-name">Pablo García</div>
+        <div class="profile-email">pablo.garcia@email.com</div>
+        <div class="profile-location">📍 Madrid, España</div>
+        <div class="profile-since">Miembro desde enero 2025</div>
+
+        <div class="fiab-big">
+          <div class="fiab-big-num">91%</div>
+          <div class="fiab-big-lbl">Fiabilidad Score</div>
+          <div class="fiab-big-sub">11 asistencias de 12 confirmadas</div>
+        </div>
+
+        <div class="mini-stats">
+          <div class="mini-stat">
+            <div class="mini-stat-val">12</div>
+            <div class="mini-stat-lbl">Partidos<br>jugados</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val">5</div>
+            <div class="mini-stat-lbl">Quedadas<br>organizadas</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val">4.3</div>
+            <div class="mini-stat-lbl">Valoración<br>media</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val">4.2</div>
+            <div class="mini-stat-lbl">Deportividad<br>media</div>
+          </div>
+        </div>
+
+        <button class="btn-edit-profile">✏️ Editar perfil</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div>
+    <!-- Sports -->
+    <div class="card">
+      <div class="section-title">
+        <span class="section-title-txt">⚽ Mis deportes</span>
+        <span class="add-link">＋ Añadir deporte</span>
+      </div>
+
+      <div class="sport-row">
+        <div class="sport-icon-wrap">⚽</div>
+        <div class="sport-info">
+          <div class="sport-name">Fútbol</div>
+          <div class="sport-role">Portero / Defensa  ·  Nivel 4</div>
+        </div>
+        <div class="level-stars">
+          <div class="star filled">★</div><div class="star filled">★</div>
+          <div class="star filled">★</div><div class="star filled">★</div>
+          <div class="star">★</div>
+        </div>
+        <div class="sport-actions">
+          <button class="sport-btn edit">Editar</button>
+          <button class="sport-btn del">✕</button>
+        </div>
+      </div>
+
+      <div class="sport-row">
+        <div class="sport-icon-wrap">🎾</div>
+        <div class="sport-info">
+          <div class="sport-name">Pádel</div>
+          <div class="sport-role">Cualquier posición  ·  Nivel 3</div>
+        </div>
+        <div class="level-stars">
+          <div class="star filled">★</div><div class="star filled">★</div>
+          <div class="star filled">★</div><div class="star">★</div>
+          <div class="star">★</div>
+        </div>
+        <div class="sport-actions">
+          <button class="sport-btn edit">Editar</button>
+          <button class="sport-btn del">✕</button>
+        </div>
+      </div>
+
+      <div class="sport-row">
+        <div class="sport-icon-wrap">🏀</div>
+        <div class="sport-info">
+          <div class="sport-name">Baloncesto</div>
+          <div class="sport-role">Base / Escolta  ·  Nivel 2</div>
+        </div>
+        <div class="level-stars">
+          <div class="star filled">★</div><div class="star filled">★</div>
+          <div class="star">★</div><div class="star">★</div>
+          <div class="star">★</div>
+        </div>
+        <div class="sport-actions">
+          <button class="sport-btn edit">Editar</button>
+          <button class="sport-btn del">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ratings -->
+    <div class="card">
+      <div class="section-title">
+        <span class="section-title-txt">⭐ Valoraciones recibidas</span>
+        <span style="font-size:11px;color:var(--gray)">Basado en 10 valoraciones</span>
+      </div>
+      <div class="ratings-row">
+        <div class="rating-stat">
+          <div style="position:relative;width:70px;height:70px;margin:0 auto 8px">
+            <svg width="70" height="70" viewBox="0 0 70 70">
+              <circle cx="35" cy="35" r="28" fill="none" stroke="#E5E7EB" stroke-width="8"/>
+              <circle cx="35" cy="35" r="28" fill="none" stroke="#2E75B6" stroke-width="8"
+                stroke-dasharray="175 176" stroke-dashoffset="44" stroke-linecap="round"
+                transform="rotate(-90 35 35)"/>
+            </svg>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:16px;font-weight:800;color:var(--blue-dark)">4.3</div>
+          </div>
+          <div class="rating-lbl">Nivel técnico</div>
+          <div class="rating-sub">⭐⭐⭐⭐½</div>
+        </div>
+        <div class="rating-stat">
+          <div style="position:relative;width:70px;height:70px;margin:0 auto 8px">
+            <svg width="70" height="70" viewBox="0 0 70 70">
+              <circle cx="35" cy="35" r="28" fill="none" stroke="#E5E7EB" stroke-width="8"/>
+              <circle cx="35" cy="35" r="28" fill="none" stroke="#16A34A" stroke-width="8"
+                stroke-dasharray="168 176" stroke-dashoffset="44" stroke-linecap="round"
+                transform="rotate(-90 35 35)"/>
+            </svg>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:16px;font-weight:800;color:var(--blue-dark)">4.2</div>
+          </div>
+          <div class="rating-lbl">Deportividad</div>
+          <div class="rating-sub">⭐⭐⭐⭐½</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent matches -->
+    <div class="card">
+      <div class="section-title">
+        <span class="section-title-txt">📅 Historial reciente</span>
+        <span class="add-link">Ver todo</span>
+      </div>
+
+      <div class="match-item">
+        <div class="match-sport">⚽</div>
+        <div class="match-info">
+          <div class="match-title">Fútbol tarde — Campo Vallecas</div>
+          <div class="match-meta">Mié 29 abr · 19:00 · Madrid</div>
+        </div>
+        <span class="match-status status-conf">Confirmado</span>
+      </div>
+      <div class="match-item">
+        <div class="match-sport">🎾</div>
+        <div class="match-info">
+          <div class="match-title">Pádel mixto — Club Norte</div>
+          <div class="match-meta">Dom 20 abr · 10:00 · Madrid</div>
+        </div>
+        <span class="match-status status-done">Jugado</span>
+      </div>
+      <div class="match-item">
+        <div class="match-sport">⚽</div>
+        <div class="match-info">
+          <div class="match-title">Fútbol 5 — Hortaleza</div>
+          <div class="match-meta">Lun 21 abr · 20:00 · Madrid</div>
+        </div>
+        <span class="match-status status-done">Jugado</span>
+      </div>
+      <div class="match-item">
+        <div class="match-sport">🏀</div>
+        <div class="match-info">
+          <div class="match-title">3x3 Retiro — Pistas exteriores</div>
+          <div class="match-meta">Sáb 12 abr · 17:00 · Madrid</div>
+        </div>
+        <span class="match-status status-miss">No asistió</span>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

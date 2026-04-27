@@ -1,0 +1,73 @@
+# =============================================================
+# .gitignore — MatchUp TFG
+# =============================================================
+
+# ─── Sistema operativo ───────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── IDE / Editor ────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.factorypath
+nbproject/private/
+.nb-gradle/
+
+# ─── Claude Code ─────────────────────────────────────────────
+.claude/
+CLAUDE.md
+
+# ─── Backend: Java / Maven / Spring Boot ─────────────────────
+backend/target/
+backend/build/
+backend/out/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+backend/HELP.md
+backend/*.log
+backend/logs/
+backend/dependency-reduced-pom.xml
+backend/.springBeans
+
+# Variables de entorno (NUNCA subir)
+backend/.env
+backend/.env.local
+backend/src/main/resources/application-local.yml
+backend/src/main/resources/application-secret.yml
+
+# ─── Frontend: Angular / Node ────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/tmp/
+frontend/out-tsc/
+frontend/.angular/
+frontend/coverage/
+frontend/.env
+frontend/.env.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# ─── Postman ─────────────────────────────────────────────────
+postman/*.environment.local.json
+
+# ─── Logs y temporales ───────────────────────────────────────
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+
+# ─── Datos sensibles ─────────────────────────────────────────
+*.pem
+*.key
+*.p12
+secrets/

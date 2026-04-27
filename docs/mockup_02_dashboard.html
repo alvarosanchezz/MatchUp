@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MatchUp — Mis Quedadas</title>
+<style>
+  :root {
+    --blue-dark:#1E3A5F; --blue-mid:#2E75B6; --blue-light:#EEF4FA;
+    --accent:#F4A300; --bg:#F0F4F8; --white:#FFFFFF;
+    --gray:#6B7280; --radius:10px; --shadow:0 2px 12px rgba(30,58,95,.1);
+    --green:#16A34A; --orange:#EA580C; --red:#DC2626; --purple:#7C3AED;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;}
+  body{background:var(--bg);min-height:100vh;}
+
+  /* NAV */
+  nav{background:var(--blue-dark);padding:0 24px;display:flex;align-items:center;height:60px;gap:32px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .nav-logo{font-size:22px;font-weight:800;color:white;letter-spacing:-0.5px;}
+  .nav-logo span{color:var(--accent);}
+  .nav-links{display:flex;gap:8px;flex:1;}
+  .nav-link{padding:6px 14px;color:rgba(255,255,255,.75);border-radius:6px;font-size:14px;cursor:pointer;transition:.2s;}
+  .nav-link:hover,.nav-link.active{background:rgba(255,255,255,.12);color:white;}
+  .nav-right{display:flex;align-items:center;gap:12px;margin-left:auto;}
+  .notif-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:white;font-size:16px;position:relative;}
+  .badge{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:#EF4444;border-radius:50%;font-size:9px;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;}
+  .avatar{width:36px;height:36px;border-radius:50%;background:var(--blue-mid);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;cursor:pointer;border:2px solid rgba(255,255,255,.3);}
+
+  /* MAIN */
+  main{max-width:1200px;margin:0 auto;padding:28px 24px;}
+
+  /* Page header */
+  .page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+  .page-title{font-size:24px;font-weight:700;color:var(--blue-dark);}
+  .btn-new{padding:10px 20px;background:var(--blue-dark);color:white;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;}
+  .btn-new:hover{background:var(--blue-mid);}
+
+  /* Stats bar */
+  .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+  .stat-card{background:var(--white);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;}
+  .stat-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+  .stat-icon.blue{background:#DBEAFE;}
+  .stat-icon.green{background:#DCFCE7;}
+  .stat-icon.orange{background:#FEF3C7;}
+  .stat-icon.purple{background:#EDE9FE;}
+  .stat-val{font-size:24px;font-weight:700;color:var(--blue-dark);}
+  .stat-lbl{font-size:12px;color:var(--gray);}
+
+  /* Tabs */
+  .tabs{display:flex;gap:0;border-bottom:2px solid #E5E7EB;margin-bottom:24px;}
+  .tab{padding:10px 24px;font-size:14px;font-weight:600;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.2s;}
+  .tab.active{color:var(--blue-dark);border-bottom-color:var(--blue-mid);}
+  .tab-count{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:var(--blue-light);color:var(--blue-mid);font-size:11px;border-radius:10px;margin-left:6px;}
+
+  /* Cards grid */
+  .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;}
+  .event-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:transform .2s;cursor:pointer;}
+  .event-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(30,58,95,.15);}
+  .card-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
+  .sport-badge{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--blue-dark);}
+  .sport-emoji{width:32px;height:32px;border-radius:8px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .status-chip{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+  .status-abierta{background:#DCFCE7;color:#15803D;}
+  .status-completa{background:#FEF3C7;color:#B45309;}
+  .status-finalizada{background:#F3F4F6;color:#6B7280;}
+  .status-cancelada{background:#FEE2E2;color:#B91C1C;}
+  .card-body{padding:0 16px 14px;}
+  .card-title{font-size:15px;font-weight:700;color:var(--blue-dark);margin-bottom:6px;}
+  .card-meta{display:flex;flex-direction:column;gap:4px;}
+  .meta-row{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray);}
+  .meta-icon{font-size:13px;width:16px;}
+  .card-footer{padding:12px 16px;border-top:1px solid #F3F4F6;display:flex;align-items:center;justify-content:space-between;}
+  .participants{display:flex;align-items:center;gap:6px;}
+  .avatar-stack{display:flex;}
+  .mini-avatar{width:24px;height:24px;border-radius:50%;border:2px solid white;background:var(--blue-mid);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;margin-left:-6px;}
+  .mini-avatar:first-child{margin-left:0;}
+  .participants-text{font-size:12px;color:var(--gray);}
+  .card-actions{display:flex;gap:6px;}
+  .btn-sm{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;}
+  .btn-edit{background:var(--blue-light);color:var(--blue-mid);}
+  .btn-danger{background:#FEE2E2;color:#B91C1C;}
+  .btn-detail{background:var(--blue-dark);color:white;}
+
+  /* Fiabilidad */
+  .fiab-bar{display:flex;align-items:center;gap:6px;margin-top:8px;}
+  .fiab-label{font-size:11px;color:var(--gray);}
+  .fiab-track{flex:1;height:6px;background:#E5E7EB;border-radius:3px;}
+  .fiab-fill{height:100%;border-radius:3px;background:var(--green);}
+  .fiab-val{font-size:11px;font-weight:700;color:var(--green);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Match<span>Up</span></div>
+  <div class="nav-links">
+    <div class="nav-link">Explorar</div>
+    <div class="nav-link active">Mis Quedadas</div>
+    <div class="nav-link">Mapa</div>
+  </div>
+  <div class="nav-right">
+    <div class="notif-btn">🔔<div class="badge">3</div></div>
+    <div class="avatar">PG</div>
+  </div>
+</nav>
+
+<main>
+  <div class="page-hdr">
+    <div>
+      <div class="page-title">Mis Quedadas</div>
+      <p style="color:var(--gray);font-size:13px;margin-top:4px;">Gestiona tus partidos organizados y tu participación</p>
+    </div>
+    <button class="btn-new">＋ Nueva quedada</button>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-icon blue">📅</div>
+      <div><div class="stat-val">12</div><div class="stat-lbl">Partidos jugados</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">✅</div>
+      <div><div class="stat-val">91%</div><div class="stat-lbl">Fiabilidad score</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange">⭐</div>
+      <div><div class="stat-val">4.3</div><div class="stat-lbl">Valoración media</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple">🏆</div>
+      <div><div class="stat-val">5</div><div class="stat-lbl">Quedadas organizadas</div></div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active">Organizadas <span class="tab-count">5</span></div>
+    <div class="tab">Apuntado <span class="tab-count">7</span></div>
+    <div class="tab">Historial <span class="tab-count">12</span></div>
+  </div>
+
+  <!-- Cards -->
+  <div class="cards-grid">
+
+    <!-- Card 1 -->
+    <div class="event-card">
+      <div class="card-header">
+        <div class="sport-badge"><div class="sport-emoji">⚽</div> Fútbol 7</div>
+        <span class="status-chip status-abierta">● Abierta</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Fútbol tarde — Vallecas</div>
+        <div class="card-meta">
+          <div class="meta-row"><span class="meta-icon">📅</span> Miércoles 29 abr · 19:00 – 21:00</div>
+          <div class="meta-row"><span class="meta-icon">📍</span> Campo Municipal Vallecas</div>
+          <div class="meta-row"><span class="meta-icon">👥</span> 8 / 14 plazas · Nivel 3-4</div>
+        </div>
+        <div class="fiab-bar">
+          <span class="fiab-label">Fiabilidad:</span>
+          <div class="fiab-track"><div class="fiab-fill" style="width:91%"></div></div>
+          <span class="fiab-val">91%</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="participants">
+          <div class="avatar-stack">
+            <div class="mini-avatar">JM</div><div class="mini-avatar">AL</div>
+            <div class="mini-avatar">CR</div><div class="mini-avatar">+5</div>
+          </div>
+          <span class="participants-text">8 apuntados</span>
+        </div>
+        <div class="card-actions">
+          <button class="btn-sm btn-edit">Editar</button>
+          <button class="btn-sm btn-danger">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="event-card">
+      <div class="card-header">
+        <div class="sport-badge"><div class="sport-emoji">🏀</div> Baloncesto</div>
+        <span class="status-chip status-completa">● Completa</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">3x3 Retiro — tarde del sábado</div>
+        <div class="card-meta">
+          <div class="meta-row"><span class="meta-icon">📅</span> Sábado 3 may · 17:00 – 18:30</div>
+          <div class="meta-row"><span class="meta-icon">📍</span> Pistas Parque del Retiro</div>
+          <div class="meta-row"><span class="meta-icon">👥</span> 6 / 6 plazas · Nivel 2-3</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="participants">
+          <div class="avatar-stack">
+            <div class="mini-avatar">LM</div><div class="mini-avatar">SS</div>
+            <div class="mini-avatar">AB</div><div class="mini-avatar">+3</div>
+          </div>
+          <span class="participants-text">Completo</span>
+        </div>
+        <div class="card-actions">
+          <button class="btn-sm btn-edit">Editar</button>
+          <button class="btn-sm btn-detail">Ver</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="event-card">
+      <div class="card-header">
+        <div class="sport-badge"><div class="sport-emoji">🎾</div> Pádel</div>
+        <span class="status-chip status-abierta">● Abierta</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Pádel dobles — Club Norte</div>
+        <div class="card-meta">
+          <div class="meta-row"><span class="meta-icon">📅</span> Domingo 4 may · 10:00 – 12:00</div>
+          <div class="meta-row"><span class="meta-icon">📍</span> Club de Pádel Norte, Madrid</div>
+          <div class="meta-row"><span class="meta-icon">👥</span> 2 / 4 plazas · Nivel 3</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="participants">
+          <div class="avatar-stack">
+            <div class="mini-avatar">PG</div><div class="mini-avatar">TR</div>
+          </div>
+          <span class="participants-text">Faltan 2</span>
+        </div>
+        <div class="card-actions">
+          <button class="btn-sm btn-edit">Editar</button>
+          <button class="btn-sm btn-danger">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4 — Finalizada -->
+    <div class="event-card">
+      <div class="card-header">
+        <div class="sport-badge"><div class="sport-emoji">⚽</div> Fútbol 5</div>
+        <span class="status-chip status-finalizada">Finalizada</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Fútbol 5 — Hortaleza</div>
+        <div class="card-meta">
+          <div class="meta-row"><span class="meta-icon">📅</span> Lun 21 abr · 20:00 – 21:30</div>
+          <div class="meta-row"><span class="meta-icon">📍</span> Polideportivo Hortaleza</div>
+          <div class="meta-row"><span class="meta-icon">⭐</span> Valoraciones: 8 / 10 enviadas</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="participants">
+          <div class="avatar-stack">
+            <div class="mini-avatar">JM</div><div class="mini-avatar">AL</div>
+            <div class="mini-avatar">+8</div>
+          </div>
+          <span class="participants-text">10 jugadores</span>
+        </div>
+        <div class="card-actions">
+          <button class="btn-sm btn-detail">Ver resumen</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</body>
+</html>
