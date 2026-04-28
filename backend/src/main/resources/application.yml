@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: matchup-backend
+  profiles:
+    active: dev   # sobreescribir con -Dspring.profiles.active=prod en producción
+
+  # ── DataSource (valores comunes; las contraseñas van en los perfiles) ──
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:matchup_db}
+    username: ${DB_USER:matchup_user}
+    password: ${DB_PASS:matchup_pass}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: MatchUpPool
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 20000
+      idle-timeout: 300000
+
+  # ── JPA ──
+  jpa:
+    hibernate:
+      ddl-auto: validate          # Flyway gestiona el esquema; JPA sólo valida
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  # ── Flyway ──
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+    out-of-order: false
+
+  # ── Mail (configurar en el perfil o con env vars) ──
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USER:}
+    password: ${MAIL_PASS:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+# ── Servidor ──
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+
+# ── JWT ──
+app:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-key-change-this-in-production-must-be-at-least-256-bits}
+    expiration-ms: ${JWT_EXPIRATION_MS:900000}          # 15 min
+    refresh-expiration-ms: ${JWT_REFRESH_MS:604800000}  # 7 días
+
+# ── Springdoc ──
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+    display-request-duration: true

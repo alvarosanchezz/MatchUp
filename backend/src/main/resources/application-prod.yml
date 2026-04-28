@@ -1,0 +1,10 @@
+spring:
+  jpa:
+    show-sql: false
+
+# ── Logs mínimos en producción ──
+logging:
+  level:
+    root: WARN
+    com.matchup: INFO
+    org.flywaydb: INFO

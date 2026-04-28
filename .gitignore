@@ -28,14 +28,12 @@ CLAUDE.md
 backend/target/
 backend/build/
 backend/out/
-backend/.mvn/
-backend/mvnw
-backend/mvnw.cmd
 backend/HELP.md
 backend/*.log
 backend/logs/
 backend/dependency-reduced-pom.xml
 backend/.springBeans
+# Nota: mvnw, mvnw.cmd y .mvn/ SÍ se versionan (Maven Wrapper)
 
 # Variables de entorno (NUNCA subir)
 backend/.env
