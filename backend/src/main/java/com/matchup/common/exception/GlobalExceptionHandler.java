@@ -93,6 +93,16 @@ public class GlobalExceptionHandler {
         return pd;
     }
 
+    // ── 400 Business Rule Violation ──────────────────────────────────────────
+
+    @ExceptionHandler(BusinessException.class)
+    public ProblemDetail handleBusiness(BusinessException ex, HttpServletRequest req) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        pd.setTitle("Bad Request");
+        pd.setInstance(URI.create(req.getRequestURI()));
+        return pd;
+    }
+
     // ── 409 Conflict ─────────────────────────────────────────────────────────
 
     @ExceptionHandler(ConflictException.class)

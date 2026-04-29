@@ -10,7 +10,6 @@ import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
 
 @Configuration
 public class OpenApiConfig {
@@ -21,9 +20,8 @@ public class OpenApiConfig {
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(apiInfo())
-                .servers(List.of(
-                        new Server().url("http://localhost:8080").description("Desarrollo local")
-                ))
+                // Sin servidores fijos: Springdoc auto-detecta la URL del request
+
                 // Aplica JWT a todos los endpoints por defecto
                 .addSecurityItem(new SecurityRequirement().addList(SCHEME_NAME))
                 .components(new Components()
