@@ -77,4 +77,12 @@ public class QuedadaController {
         quedadaService.cancelar(id, principal.getUsername());
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/finalize")
+    @Operation(summary = "Finalizar quedada — cambia estado a FINALIZADA (solo organizador)")
+    public ResponseEntity<QuedadaDetailResponse> finalizar(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails principal) {
+        return ResponseEntity.ok(quedadaService.finalizar(id, principal.getUsername()));
+    }
 }

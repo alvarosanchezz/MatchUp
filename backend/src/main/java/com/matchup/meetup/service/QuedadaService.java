@@ -115,6 +115,35 @@ public class QuedadaService {
         quedadaRepository.save(quedada);
     }
 
+    @Transactional
+    public QuedadaDetailResponse finalizar(Long id, String email) {
+        Quedada quedada = findById(id);
+        requireOrganizador(quedada, email);
+
+        if (quedada.getEstado() == EstadoQuedada.FINALIZADA
+                || quedada.getEstado() == EstadoQuedada.CANCELADA) {
+            throw new BusinessException("No se puede finalizar una quedada en estado " + quedada.getEstado());
+        }
+        quedada.setEstado(EstadoQuedada.FINALIZADA);
+        return quedadaMapper.toDetailResponse(quedadaRepository.save(quedada));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<QuedadaSummaryResponse> getMisQuedadas(String email, String role, Pageable pageable) {
+        Usuario usuario = findUsuarioByEmail(email);
+        return switch (role.toUpperCase()) {
+            case "ORGANIZADAS" -> quedadaRepository
+                    .findByOrganizadorId(usuario.getId(), pageable)
+                    .map(quedadaMapper::toSummaryResponse);
+            case "APUNTADAS" -> quedadaRepository
+                    .findApuntadasByUsuarioId(usuario.getId(), pageable)
+                    .map(quedadaMapper::toSummaryResponse);
+            default -> quedadaRepository
+                    .findOrganizadasOApuntadasByUsuarioId(usuario.getId(), pageable)
+                    .map(quedadaMapper::toSummaryResponse);
+        };
+    }
+
     // ── helpers ──────────────────────────────────────────────────────────────
 
     public Quedada findById(Long id) {

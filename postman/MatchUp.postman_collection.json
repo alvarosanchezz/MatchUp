@@ -1,0 +1,1201 @@
+{
+  "info": {
+    "name": "MatchUp",
+    "_postman_id": "matchup-collection-001",
+    "description": "Colección completa de la API MatchUp — Spring Boot 3 + JWT",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-inject Authorization header when accessToken is present",
+          "const token = pm.environment.get('accessToken');",
+          "if (token) {",
+          "    pm.request.headers.upsert({",
+          "        key: 'Authorization',",
+          "        value: 'Bearer ' + token",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                  "try {",
+                  "    const json = pm.response.json();",
+                  "    if (json.access_token) pm.environment.set('accessToken', json.access_token);",
+                  "    if (json.refresh_token) pm.environment.set('refreshToken', json.refresh_token);",
+                  "} catch(e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/register", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario Test\",\n  \"email\": \"test@matchup.com\",\n  \"password\": \"Password1!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "try {",
+                  "    const json = pm.response.json();",
+                  "    if (json.access_token) pm.environment.set('accessToken', json.access_token);",
+                  "    if (json.refresh_token) pm.environment.set('refreshToken', json.refresh_token);",
+                  "} catch(e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/login", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@matchup.com\",\n  \"password\": \"Password1!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "try {",
+                  "    const json = pm.response.json();",
+                  "    if (json.access_token) pm.environment.set('accessToken', json.access_token);",
+                  "    if (json.refresh_token) pm.environment.set('refreshToken', json.refresh_token);",
+                  "} catch(e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/refresh", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","refresh"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/logout", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","logout"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 202 Accepted', () => pm.response.to.have.status(202));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/forgot-password", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","forgot-password"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@matchup.com\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/reset-password", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","reset-password"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"<reset-token-from-email>\",\n  \"newPassword\": \"NewPassword1!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "try {",
+                  "    const json = pm.response.json();",
+                  "    pm.environment.set('userId', json.id);",
+                  "} catch(e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/users/me", "host": ["{{baseUrl}}"], "path": ["api","v1","users","me"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Update My Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/users/me", "host": ["{{baseUrl}}"], "path": ["api","v1","users","me"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nuevo Nombre\",\n  \"ubicacionLatitud\": 40.4168,\n  \"ubicacionLongitud\": -3.7038\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Sports",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/users/me/sports", "host": ["{{baseUrl}}"], "path": ["api","v1","users","me","sports"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Update My Sports",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/users/me/sports", "host": ["{{baseUrl}}"], "path": ["api","v1","users","me","sports"] },
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  { \"idDeporte\": 1, \"nivel\": 4, \"rolPreferido\": \"Delantero\" },\n  { \"idDeporte\": 6, \"nivel\": 3, \"rolPreferido\": null }\n]",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Meetups",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/me/meetups?role=TODAS",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","v1","users","me","meetups"],
+              "query": [{ "key": "role", "value": "TODAS" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Public Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","users","{{userId}}"] }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Sports",
+      "item": [
+        {
+          "name": "List Sports",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Response is array', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/sports", "host": ["{{baseUrl}}"], "path": ["api","v1","sports"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Sport (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                  "try {",
+                  "    const json = pm.response.json();",
+                  "    pm.environment.set('sportId', json.id);",
+                  "} catch(e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/sports", "host": ["{{baseUrl}}"], "path": ["api","v1","sports"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Pickleball\",\n  \"jugadoresDefault\": 2,\n  \"descripcion\": \"Deporte emergente con raqueta y pala.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Sport (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/sports/{{sportId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","sports","{{sportId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Descripción actualizada del deporte.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Sport (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/sports/{{sportId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","sports","{{sportId}}"] }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Meetups",
+      "item": [
+        {
+          "name": "Create Meetup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                  "try {",
+                  "    const json = pm.response.json();",
+                  "    pm.environment.set('meetupId', json.id);",
+                  "} catch(e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idDeporte\": 1,\n  \"fechaHoraInicio\": \"2026-08-15T10:00:00\",\n  \"fechaHoraFin\": \"2026-08-15T12:00:00\",\n  \"ubicacionNombre\": \"Polideportivo Municipal\",\n  \"ubicacionLatitud\": 40.4168,\n  \"ubicacionLongitud\": -3.7038,\n  \"numJugadoresTotal\": 14,\n  \"esPublica\": true,\n  \"descripcion\": \"Partido amistoso de fútbol 7\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Meetups",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Response has content array', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('content');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/meetups?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","v1","meetups"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" },
+                { "key": "idDeporte", "value": "", "disabled": true },
+                { "key": "estado", "value": "ABIERTA", "disabled": true },
+                { "key": "lat", "value": "40.4168", "disabled": true },
+                { "key": "lon", "value": "-3.7038", "disabled": true },
+                { "key": "radioKm", "value": "10", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Meetup Detail",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Meetup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Descripción actualizada del partido\",\n  \"numJugadoresTotal\": 12\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Meetup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Finalize Meetup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Estado es FINALIZADA', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.estado).to.eql('FINALIZADA');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}/finalize", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}","finalize"] }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Participations",
+      "item": [
+        {
+          "name": "Join Meetup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Estado PENDIENTE', () => {",
+                  "    pm.expect(pm.response.json().estadoAsistencia).to.eql('PENDIENTE');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}/participations/join", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}","participations","join"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Leave Meetup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}/participations/leave", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}","participations","leave"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirm Attendance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Estado CONFIRMADO', () => {",
+                  "    pm.expect(pm.response.json().estadoAsistencia).to.eql('CONFIRMADO');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}/participations/{{userId}}/confirm", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}","participations","{{userId}}","confirm"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark No-Show",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Estado AUSENTE', () => {",
+                  "    pm.expect(pm.response.json().estadoAsistencia).to.eql('AUSENTE');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}/participations/{{userId}}/no-show", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}","participations","{{userId}}","no-show"] }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Ratings",
+      "item": [
+        {
+          "name": "Rate Participant",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}/ratings", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}","ratings"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idValorado\": {{userId}},\n  \"nivelNota\": 4,\n  \"deportividadNota\": 5\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Received Ratings",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Response is array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}/ratings/received", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}","ratings","received"] }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Add Comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}/comments", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}","comments"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenido\": \"¡Nos vemos en la cancha!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Comments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}/comments?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}","comments"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}/comments/1", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}","comments","1"] }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "🧪 Flujo completo",
+      "description": "Runner secuencial que replica el FullFlowIntegrationTest. Ejecutar en orden con Postman Collection Runner.",
+      "item": [
+        {
+          "name": "[01] Register Ana",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/register", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ana\",\n  \"email\": \"ana@flowtest.com\",\n  \"password\": \"Password1!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[02] Register Carlos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/register", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Carlos\",\n  \"email\": \"carlos@flowtest.com\",\n  \"password\": \"Password1!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[03] Login Ana",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('anaToken', json.access_token);",
+                  "pm.environment.set('accessToken', json.access_token);",
+                  "pm.environment.set('refreshToken', json.refresh_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/login", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ana@flowtest.com\",\n  \"password\": \"Password1!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[04] Get Me Ana — obtener anaId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('anaId', json.id);",
+                  "pm.environment.set('userId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{anaToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/users/me", "host": ["{{baseUrl}}"], "path": ["api","v1","users","me"] }
+          },
+          "response": []
+        },
+        {
+          "name": "[05] Create Meetup — obtener meetupId",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// fecha inicio = ahora + 30 días",
+                  "const inicio = new Date();",
+                  "inicio.setDate(inicio.getDate() + 30);",
+                  "const fin = new Date(inicio);",
+                  "fin.setHours(fin.getHours() + 2);",
+                  "pm.variables.set('fechaInicio', inicio.toISOString().slice(0,19));",
+                  "pm.variables.set('fechaFin',    fin.toISOString().slice(0,19));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('Estado ABIERTA', () => pm.expect(pm.response.json().estado).to.eql('ABIERTA'));",
+                  "pm.environment.set('meetupId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{anaToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idDeporte\": 1,\n  \"fechaHoraInicio\": \"{{fechaInicio}}\",\n  \"fechaHoraFin\": \"{{fechaFin}}\",\n  \"ubicacionNombre\": \"Polideportivo Central\",\n  \"ubicacionLatitud\": 40.4168,\n  \"ubicacionLongitud\": -3.7038,\n  \"numJugadoresTotal\": 10,\n  \"esPublica\": true,\n  \"descripcion\": \"Partido de prueba flujo completo\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[06] Login Carlos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('carlosToken', json.access_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/login", "host": ["{{baseUrl}}"], "path": ["api","v1","auth","login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"carlos@flowtest.com\",\n  \"password\": \"Password1!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[07] Get Me Carlos — obtener carlosId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.environment.set('carlosId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{carlosToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/users/me", "host": ["{{baseUrl}}"], "path": ["api","v1","users","me"] }
+          },
+          "response": []
+        },
+        {
+          "name": "[08] List Meetups — aparece la quedada de Ana",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Contiene quedada creada', () => {",
+                  "    const meetups = pm.response.json().content;",
+                  "    const id = parseInt(pm.environment.get('meetupId'));",
+                  "    pm.expect(meetups.some(m => m.id === id)).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{carlosToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups"] }
+          },
+          "response": []
+        },
+        {
+          "name": "[09] Carlos se apunta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Estado PENDIENTE', () => {",
+                  "    pm.expect(pm.response.json().estadoAsistencia).to.eql('PENDIENTE');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{carlosToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}/participations/join", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}","participations","join"] }
+          },
+          "response": []
+        },
+        {
+          "name": "[10] Ana finaliza la quedada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Estado FINALIZADA', () => {",
+                  "    pm.expect(pm.response.json().estado).to.eql('FINALIZADA');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{anaToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}/finalize", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}","finalize"] }
+          },
+          "response": []
+        },
+        {
+          "name": "[11] Ana confirma asistencia de Carlos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Estado CONFIRMADO', () => {",
+                  "    pm.expect(pm.response.json().estadoAsistencia).to.eql('CONFIRMADO');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{anaToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}/participations/{{carlosId}}/confirm", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}","participations","{{carlosId}}","confirm"] }
+          },
+          "response": []
+        },
+        {
+          "name": "[12] Verificar fiabilidad de Carlos = 100 %",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Fiabilidad 100 %', () => {",
+                  "    pm.expect(pm.response.json().fiabilidadScore).to.eql(100);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{anaToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/users/{{carlosId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","users","{{carlosId}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "[13] Carlos valora a Ana",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{carlosToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}/ratings", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}","ratings"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idValorado\": {{anaId}},\n  \"nivelNota\": 5,\n  \"deportividadNota\": 5\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[14] Ana lista sus ratings recibidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('1 rating recibido con nota 5', () => {",
+                  "    const ratings = pm.response.json();",
+                  "    pm.expect(ratings).to.have.lengthOf(1);",
+                  "    pm.expect(ratings[0].nivelNota).to.eql(5);",
+                  "    pm.expect(ratings[0].deportividadNota).to.eql(5);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{anaToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/meetups/{{meetupId}}/ratings/received", "host": ["{{baseUrl}}"], "path": ["api","v1","meetups","{{meetupId}}","ratings","received"] }
+          },
+          "response": []
+        }
+      ]
+    }
+
+  ]
+}
