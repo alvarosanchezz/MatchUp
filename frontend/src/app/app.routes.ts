@@ -9,11 +9,42 @@ export const routes: Routes = [
       import('./shared/layout/main-layout.component').then(m => m.MainLayoutComponent),
     canActivate: [authGuard],
     children: [
+      // Quedadas — orden importa: 'new' antes de ':id'
       {
         path: 'meetups',
         loadComponent: () =>
           import('./features/meetups/meetups.component').then(m => m.MeetupsComponent),
       },
+      {
+        path: 'meetups/new',
+        loadComponent: () =>
+          import('./features/meetups/meetup-form/meetup-form.component').then(
+            m => m.MeetupFormComponent
+          ),
+      },
+      {
+        path: 'meetups/:id',
+        loadComponent: () =>
+          import('./features/meetups/meetup-detail/meetup-detail.component').then(
+            m => m.MeetupDetailComponent
+          ),
+      },
+      {
+        path: 'meetups/:id/edit',
+        loadComponent: () =>
+          import('./features/meetups/meetup-form/meetup-form.component').then(
+            m => m.MeetupFormComponent
+          ),
+      },
+      // Perfiles públicos
+      {
+        path: 'users/:id',
+        loadComponent: () =>
+          import('./features/users/user-profile/user-profile.component').then(
+            m => m.UserProfileComponent
+          ),
+      },
+      // Perfil propio y deportes
       {
         path: 'profile',
         loadComponent: () =>

@@ -1,0 +1,175 @@
+<div class="meetups-page">
+  <!-- ── Cabecera ── -->
+  <div class="page-header">
+    <h1 class="page-title">Quedadas</h1>
+    <a mat-raised-button color="primary" routerLink="/meetups/new">
+      <mat-icon>add</mat-icon>
+      Nueva quedada
+    </a>
+  </div>
+
+  <!-- ── Panel de filtros ── -->
+  <mat-expansion-panel class="filters-panel">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <mat-icon class="filter-icon">filter_list</mat-icon>
+        Filtros
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <form [formGroup]="filterForm" class="filter-form">
+      <div class="filter-row">
+        <mat-form-field>
+          <mat-label>Deporte</mat-label>
+          <mat-select formControlName="idDeporte">
+            <mat-option [value]="null">Todos</mat-option>
+            @for (sport of sports(); track sport.id) {
+              <mat-option [value]="sport.id">{{ sport.nombre }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Fecha desde</mat-label>
+          <input matInput [matDatepicker]="pickerDesde" formControlName="fechaDesde" />
+          <mat-datepicker-toggle matIconSuffix [for]="pickerDesde" />
+          <mat-datepicker #pickerDesde />
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Fecha hasta</mat-label>
+          <input matInput [matDatepicker]="pickerHasta" formControlName="fechaHasta" />
+          <mat-datepicker-toggle matIconSuffix [for]="pickerHasta" />
+          <mat-datepicker #pickerHasta />
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="estado">
+            <mat-option [value]="null">Todos</mat-option>
+            @for (estado of estados; track estado) {
+              <mat-option [value]="estado">{{ estadoLabels[estado] }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      @if (locationSet()) {
+        <div class="slider-row">
+          <span class="slider-label">Radio: {{ sliderValue() }} km</span>
+          <mat-slider min="1" max="50" step="1" class="distance-slider">
+            <input matSliderThumb formControlName="radioKm" />
+          </mat-slider>
+        </div>
+      }
+
+      <div class="filter-actions">
+        <button mat-stroked-button type="button" (click)="useMyLocation()">
+          <mat-icon>my_location</mat-icon>
+          {{ locationSet() ? 'Ubicación activa' : 'Usar mi ubicación' }}
+        </button>
+        <button mat-stroked-button type="button" (click)="clearFilters()">Limpiar</button>
+        <button mat-raised-button color="primary" type="button" (click)="applyFilters()">
+          <mat-icon>search</mat-icon>
+          Buscar
+        </button>
+      </div>
+    </form>
+  </mat-expansion-panel>
+
+  <!-- ── Tabs: Lista / Mapa ── -->
+  <mat-tab-group animationDuration="200ms" (selectedIndexChange)="onTabChange($event)" class="content-tabs">
+
+    <!-- Tab Lista -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">view_list</mat-icon>
+        Lista
+      </ng-template>
+
+      @if (loading()) {
+        <div class="loading-container">
+          <mat-spinner diameter="48" />
+        </div>
+      } @else if (meetups().length === 0) {
+        <div class="empty-state">
+          <mat-icon>sports</mat-icon>
+          <p>No hay quedadas con los filtros seleccionados</p>
+          <button mat-stroked-button (click)="clearFilters()">Limpiar filtros</button>
+        </div>
+      } @else {
+        <div class="cards-grid">
+          @for (meetup of meetups(); track meetup.id) {
+            <mat-card class="meetup-card" (click)="goToDetail(meetup.id)">
+              <mat-card-header>
+                <div class="card-header-content">
+                  <div>
+                    <mat-card-title>{{ meetup.nombreDeporte }}</mat-card-title>
+                    <mat-card-subtitle>
+                      {{ meetup.fechaHoraInicio | date: 'dd/MM/yyyy HH:mm' }}
+                    </mat-card-subtitle>
+                  </div>
+                  <span [class]="'estado-badge ' + stateClass(meetup.estado)">
+                    {{ stateLabel(meetup.estado) }}
+                  </span>
+                </div>
+              </mat-card-header>
+
+              <mat-card-content>
+                <p class="card-row">
+                  <mat-icon class="card-icon">place</mat-icon>
+                  {{ meetup.ubicacionNombre }}
+                </p>
+                <p class="card-row">
+                  <mat-icon class="card-icon">group</mat-icon>
+                  {{ meetup.numParticipantesActivos }} / {{ meetup.numJugadoresTotal }} jugadores
+                </p>
+                @if (meetup.descripcion) {
+                  <p class="card-description">{{ meetup.descripcion }}</p>
+                }
+              </mat-card-content>
+
+              <mat-card-actions align="end">
+                <button
+                  mat-button
+                  color="primary"
+                  (click)="goToDetail(meetup.id); $event.stopPropagation()"
+                >
+                  Ver detalle
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          }
+        </div>
+
+        <mat-paginator
+          [length]="totalElements()"
+          [pageSize]="pageSize"
+          [pageIndex]="page()"
+          [pageSizeOptions]="[20]"
+          (page)="onPageChange($event)"
+          hidePageSize
+          showFirstLastButtons
+        />
+      }
+    </mat-tab>
+
+    <!-- Tab Mapa -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">map</mat-icon>
+        Mapa
+      </ng-template>
+
+      <div class="map-wrapper">
+        <div #mapContainer class="map-container"></div>
+        <div class="map-legend">
+          <span class="legend-item"><span class="dot dot-abierta"></span>Abierta</span>
+          <span class="legend-item"><span class="dot dot-completa"></span>Completa</span>
+          <span class="legend-item"><span class="dot dot-finalizada"></span>Finalizada</span>
+          <span class="legend-item"><span class="dot dot-cancelada"></span>Cancelada</span>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
