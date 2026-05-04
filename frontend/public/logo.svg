@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 44" fill="none" role="img" aria-label="MatchUp logo">
+  <!-- Icon: M lettermark in rounded blue square -->
+  <rect width="44" height="44" rx="10" fill="#1565C0"/>
+  <path d="M9 35 L9 9 L22 26 L35 9 L35 35"
+        stroke="white" stroke-width="4.5"
+        stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- Wordmark: Match (blue) + Up (orange) -->
+  <text x="54" y="32"
+        font-family="Roboto, Arial, Helvetica, sans-serif"
+        font-size="22" font-weight="700" letter-spacing="-0.3"
+        fill="#1565C0">Match</text>
+  <text x="126" y="32"
+        font-family="Roboto, Arial, Helvetica, sans-serif"
+        font-size="22" font-weight="700" letter-spacing="-0.3"
+        fill="#F57C00">Up</text>
+</svg>

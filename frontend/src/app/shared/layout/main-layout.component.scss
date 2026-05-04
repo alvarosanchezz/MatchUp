@@ -1,0 +1,54 @@
+.main-container {
+  height: 100vh;
+}
+
+.sidenav {
+  width: 240px;
+}
+
+.sidenav-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.toolbar-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.user-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  font-size: 14px;
+  color: white;
+}
+
+// Active nav item highlight
+::ng-deep .nav-active {
+  background-color: rgba(25, 118, 210, 0.1) !important;
+  color: #1976d2 !important;
+
+  .mat-icon {
+    color: #1976d2;
+  }
+}

@@ -1,0 +1,103 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+  <mat-card class="w-full max-w-md shadow-lg">
+    <mat-card-header class="flex justify-center pt-6 pb-2">
+      <mat-card-title class="text-2xl font-bold text-center">MatchUp</mat-card-title>
+      <mat-card-subtitle class="text-center mt-1">Crea tu cuenta</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="px-6 pt-4">
+      <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-1">
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="nombre" autocomplete="name" />
+          @if (form.get('nombre')!.invalid && form.get('nombre')!.touched) {
+            <mat-error>
+              @if (form.get('nombre')!.hasError('required')) { El nombre es obligatorio }
+              @else if (form.get('nombre')!.hasError('maxlength')) { Máximo 100 caracteres }
+              @else if (form.get('nombre')!.hasError('serverError')) {
+                {{ form.get('nombre')!.getError('serverError') }}
+              }
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" autocomplete="email" />
+          @if (form.get('email')!.invalid && form.get('email')!.touched) {
+            <mat-error>
+              @if (form.get('email')!.hasError('required')) { El email es obligatorio }
+              @else if (form.get('email')!.hasError('email')) { Introduce un email válido }
+              @else if (form.get('email')!.hasError('maxlength')) { Máximo 255 caracteres }
+              @else if (form.get('email')!.hasError('serverError')) {
+                {{ form.get('email')!.getError('serverError') }}
+              }
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Contraseña</mat-label>
+          <input
+            matInput
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="new-password"
+          />
+          <button mat-icon-button matSuffix type="button" (click)="showPassword = !showPassword">
+            <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (form.get('password')!.invalid && form.get('password')!.touched) {
+            <mat-error>
+              @if (form.get('password')!.hasError('required')) { La contraseña es obligatoria }
+              @else if (form.get('password')!.hasError('minlength')) { Mínimo 8 caracteres }
+              @else if (form.get('password')!.hasError('serverError')) {
+                {{ form.get('password')!.getError('serverError') }}
+              }
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Confirmar contraseña</mat-label>
+          <input
+            matInput
+            [type]="showConfirm ? 'text' : 'password'"
+            formControlName="confirmarPassword"
+            autocomplete="new-password"
+          />
+          <button mat-icon-button matSuffix type="button" (click)="showConfirm = !showConfirm">
+            <mat-icon>{{ showConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (form.get('confirmarPassword')!.touched) {
+            @if (form.get('confirmarPassword')!.hasError('required')) {
+              <mat-error>Confirma la contraseña</mat-error>
+            } @else if (form.hasError('passwordMismatch')) {
+              <mat-error>Las contraseñas no coinciden</mat-error>
+            }
+          }
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="loading"
+          class="w-full h-11 mt-2"
+        >
+          @if (loading) {
+            <mat-spinner diameter="22" class="mx-auto" />
+          } @else {
+            Crear cuenta
+          }
+        </button>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions class="flex justify-center pb-6 pt-2">
+      <span class="text-sm text-gray-500">¿Ya tienes cuenta?</span>
+      <a routerLink="/auth/login" mat-button color="primary" class="ml-1">Inicia sesión</a>
+    </mat-card-actions>
+  </mat-card>
+</div>

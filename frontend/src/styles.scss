@@ -1,0 +1,51 @@
+@use '@angular/material' as mat;
+
+// ── Tailwind (preflight OFF para evitar conflictos con el reset de Material) ──
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// ── Angular Material M3 — tema custom MatchUp ────────────────────────────────
+@include mat.core();
+
+$matchup-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary:   mat.$azure-palette,
+    tertiary:  mat.$orange-palette,
+  ),
+  typography: (
+    brand-family: "'Roboto', 'Helvetica Neue', sans-serif",
+    plain-family: "'Roboto', 'Helvetica Neue', sans-serif",
+  ),
+  density: (
+    scale: 0,
+  ),
+));
+
+// Declaraciones antes del @include para evitar el warning SASS mixed-decls
+html {
+  height: 100%;
+  @include mat.all-component-themes($matchup-theme);
+}
+
+// ── Base global ───────────────────────────────────────────────────────────────
+body {
+  margin: 0;
+  height: 100%;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background-color: #f5f5f5;
+  color: #212121;
+}
+
+// ── CSS custom properties (disponibles en templates y componentes SCSS) ───────
+:root {
+  --mu-primary:       #1565C0;
+  --mu-primary-light: #1E88E5;
+  --mu-accent:        #F57C00;
+  --mu-accent-light:  #FFA726;
+  --mu-bg:            #F5F5F5;
+  --mu-surface:       #FFFFFF;
+  --mu-text:          #212121;
+  --mu-text-muted:    #757575;
+}
