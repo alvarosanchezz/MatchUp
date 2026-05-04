@@ -31,3 +31,16 @@ export interface UsuarioPublicResponse {
   rol: RolUsuario;
   deportes: UsuarioPreferenciaResponse[];
 }
+
+export interface UsuarioUpdateRequest {
+  nombre?: string;
+  ubicacionLatitud?: number;
+  ubicacionLongitud?: number;
+  urlFotoPerfil?: string;
+}
+
+export interface UsuarioPreferenciaRequest {
+  idDeporte: number;
+  nivel: number;
+  rolPreferido?: string;
+}

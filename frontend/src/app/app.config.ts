@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, APP_INITIALIZER } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -6,6 +6,21 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { refreshInterceptor } from './core/interceptors/refresh.interceptor';
+import { AuthService } from './core/services/auth.service';
+import { TokenService } from './core/services/token.service';
+
+function initializeApp(authService: AuthService, tokenService: TokenService) {
+  return (): Promise<void> => {
+    if (!tokenService.isLoggedIn()) return Promise.resolve();
+    return authService
+      .loadCurrentUser()
+      .toPromise()
+      .then(() => undefined)
+      .catch(() => {
+        tokenService.clear();
+      });
+  };
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,5 +28,11 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(withInterceptors([authInterceptor, refreshInterceptor])),
     provideAnimations(),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeApp,
+      deps: [AuthService, TokenService],
+      multi: true,
+    },
   ],
 };
