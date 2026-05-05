@@ -1,0 +1,292 @@
+<div class="detail-page">
+
+  <!-- ── Volver ── -->
+  <a mat-button routerLink="/meetups" class="back-btn">
+    <mat-icon>arrow_back</mat-icon>
+    Volver a quedadas
+  </a>
+
+  <!-- ── Spinner ── -->
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="52" />
+    </div>
+  }
+
+  <!-- ── Contenido principal ── -->
+  @if (meetup(); as m) {
+
+    <!-- Header card -->
+    <mat-card class="header-card">
+      <mat-card-content>
+        <div class="header-top">
+          <div class="header-title-block">
+            <h1 class="sport-title">{{ m.nombreDeporte }}</h1>
+            <span [class]="'estado-badge badge-' + m.estado.toLowerCase()">
+              {{ estadoLabel(m.estado) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="meta-grid">
+          <div class="meta-item">
+            <mat-icon>calendar_today</mat-icon>
+            <span>
+              {{ m.fechaHoraInicio | date:'dd/MM/yyyy HH:mm' }}
+              –
+              {{ m.fechaHoraFin | date:'HH:mm' }}
+            </span>
+          </div>
+          <div class="meta-item">
+            <mat-icon>place</mat-icon>
+            <span>{{ m.ubicacionNombre }}</span>
+          </div>
+          <div class="meta-item">
+            <mat-icon>group</mat-icon>
+            <span>{{ m.numParticipantesActivos }} / {{ m.numJugadoresTotal }} jugadores</span>
+          </div>
+          @if (!m.esPublica) {
+            <div class="meta-item">
+              <mat-icon>lock</mat-icon>
+              <span>Quedada privada</span>
+            </div>
+          }
+        </div>
+
+        <div class="organizer-row">
+          <span class="meta-label">Organiza:</span>
+          <a [routerLink]="['/users', m.idOrganizador]" class="organizer-link">
+            <div class="avatar-sm">{{ initials(m.nombreOrganizador) }}</div>
+            <span>{{ m.nombreOrganizador }}</span>
+          </a>
+        </div>
+
+        @if (m.descripcion) {
+          <p class="description">{{ m.descripcion }}</p>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Mini mapa -->
+    <mat-card class="map-card">
+      <div #miniMap class="mini-map"></div>
+    </mat-card>
+
+    <!-- Acciones contextuales -->
+    @if (hasActions()) {
+      <mat-card class="actions-card">
+        <mat-card-header>
+          <mat-card-title>Acciones</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+
+          <!-- Organizador: ABIERTA / COMPLETA -->
+          @if (isOrganizer() && (m.estado === 'ABIERTA' || m.estado === 'COMPLETA')) {
+            <div class="action-buttons">
+              <a mat-stroked-button [routerLink]="['/meetups', m.id, 'edit']">
+                <mat-icon>edit</mat-icon> Editar
+              </a>
+              <button mat-stroked-button color="warn" (click)="cancelMeetup()" [disabled]="actionLoading()">
+                <mat-icon>cancel</mat-icon> Cancelar quedada
+              </button>
+              <button mat-raised-button color="primary" (click)="finalizeMeetup()" [disabled]="actionLoading()">
+                <mat-icon>check_circle</mat-icon> Finalizar
+              </button>
+            </div>
+          }
+
+          <!-- Organizador: FINALIZADA — confirmar asistencia -->
+          @if (isOrganizer() && m.estado === 'FINALIZADA') {
+            @if (pendingParticipants().length > 0) {
+              <p class="section-label">Confirmar asistencia de participantes:</p>
+              <div class="attendance-list">
+                @for (p of m.participantes; track p.idUsuario) {
+                  @if (p.estadoAsistencia === 'PENDIENTE') {
+                    <div class="attendance-row">
+                      <div class="attendance-user">
+                        <div class="avatar-sm">{{ initials(p.nombre) }}</div>
+                        <span>{{ p.nombre }}</span>
+                      </div>
+                      <div class="attendance-actions">
+                        <button
+                          mat-icon-button
+                          color="primary"
+                          matTooltip="Confirmar asistencia"
+                          (click)="confirmAttendance(p.idUsuario)">
+                          <mat-icon>check_circle</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button
+                          color="warn"
+                          matTooltip="Marcar como ausente"
+                          (click)="markNoShow(p.idUsuario)">
+                          <mat-icon>cancel</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            } @else {
+              <p class="empty-text">
+                <mat-icon class="inline-icon">check_circle</mat-icon>
+                Todos los participantes han sido procesados
+              </p>
+            }
+          }
+
+          <!-- No organizador: Apuntarme -->
+          @if (canJoin()) {
+            <div class="action-buttons">
+              <button mat-raised-button color="primary" (click)="joinMeetup()" [disabled]="actionLoading()">
+                <mat-icon>add_circle</mat-icon> Apuntarme
+              </button>
+            </div>
+          }
+
+          <!-- No organizador: Desapuntarme -->
+          @if (canLeave()) {
+            <div class="action-buttons">
+              <button mat-stroked-button color="warn" (click)="leaveMeetup()" [disabled]="actionLoading()">
+                <mat-icon>exit_to_app</mat-icon> Desapuntarme
+              </button>
+            </div>
+          }
+
+          <!-- Valorar participantes -->
+          @if (canRate()) {
+            <div class="action-buttons">
+              <button mat-raised-button color="accent" (click)="openRateDialog()">
+                <mat-icon>star</mat-icon> Valorar participantes
+              </button>
+            </div>
+          }
+
+        </mat-card-content>
+      </mat-card>
+    }
+
+    <!-- Participantes -->
+    <mat-card class="participants-card">
+      <mat-card-header>
+        <mat-card-title>
+          Participantes
+          <span class="count-chip">{{ m.numParticipantesActivos }}/{{ m.numJugadoresTotal }}</span>
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (m.participantes.length === 0) {
+          <p class="empty-text">Aún no hay participantes apuntados</p>
+        } @else {
+          <div class="participants-grid">
+            @for (p of m.participantes; track p.idUsuario) {
+              <a
+                [routerLink]="['/users', p.idUsuario]"
+                class="participant-chip"
+                [matTooltip]="p.nombre + ' — ' + asistenciaLabel(p.estadoAsistencia)"
+                matTooltipPosition="above">
+                <div [class]="'participant-avatar estado-' + p.estadoAsistencia.toLowerCase()">
+                  @if (p.urlFotoPerfil) {
+                    <img [src]="p.urlFotoPerfil" [alt]="p.nombre" />
+                  } @else {
+                    {{ initials(p.nombre) }}
+                  }
+                </div>
+                <span class="participant-name">{{ p.nombre }}</span>
+              </a>
+            }
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Comentarios -->
+    <mat-card class="comments-card">
+      <mat-card-header>
+        <mat-card-title>Comentarios</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+
+        @if (commentsLoading()) {
+          <div class="comments-spinner">
+            <mat-spinner diameter="32" />
+          </div>
+        } @else if (comments().length === 0) {
+          <p class="empty-text">No hay comentarios aún. ¡Sé el primero!</p>
+        } @else {
+          <div class="comments-list">
+            @for (c of comments(); track c.id; let last = $last) {
+              <div class="comment-item">
+                <div class="comment-header">
+                  <div class="comment-author-row">
+                    <div class="avatar-xs">{{ initials(c.nombreUsuario) }}</div>
+                    <span class="comment-author">{{ c.nombreUsuario }}</span>
+                    <span class="comment-date">{{ c.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                  @if (canDeleteComment(c)) {
+                    <button
+                      mat-icon-button
+                      class="delete-btn"
+                      matTooltip="Eliminar comentario"
+                      (click)="deleteComment(c.id)">
+                      <mat-icon>delete_outline</mat-icon>
+                    </button>
+                  }
+                </div>
+                <p class="comment-body">{{ c.contenido }}</p>
+              </div>
+              @if (!last) {
+                <mat-divider />
+              }
+            }
+          </div>
+        }
+
+        @if (commentTotal() > commentPageSize) {
+          <mat-paginator
+            [length]="commentTotal()"
+            [pageSize]="commentPageSize"
+            [pageIndex]="commentPage()"
+            [pageSizeOptions]="[20]"
+            (page)="onCommentPageChange($event)"
+            hidePageSize />
+        }
+
+        <!-- Formulario nuevo comentario -->
+        @if (canComment()) {
+          <div class="comment-form-wrapper">
+            <mat-divider />
+            <form [formGroup]="commentForm" (ngSubmit)="submitComment()" class="comment-form">
+              <mat-form-field class="comment-field">
+                <mat-label>Escribe un comentario</mat-label>
+                <textarea
+                  matInput
+                  formControlName="contenido"
+                  rows="3"
+                  maxlength="1000">
+                </textarea>
+                <mat-hint align="end">
+                  {{ commentForm.get('contenido')?.value?.length ?? 0 }}/1000
+                </mat-hint>
+                @if (commentForm.get('contenido')?.hasError('required') && commentForm.get('contenido')?.touched) {
+                  <mat-error>El comentario no puede estar vacío</mat-error>
+                }
+              </mat-form-field>
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="commentForm.invalid || commentSubmitting()">
+                <mat-icon>send</mat-icon>
+                Enviar
+              </button>
+            </form>
+          </div>
+        }
+
+      </mat-card-content>
+    </mat-card>
+
+  } <!-- end @if (meetup()) -->
+
+</div>
