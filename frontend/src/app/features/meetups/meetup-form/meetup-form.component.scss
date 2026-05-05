@@ -1,0 +1,187 @@
+.form-page {
+  padding: 16px 24px 48px;
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+// ── Cabecera ──────────────────────────────────────────────────────────────────
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.back-btn {
+  color: rgba(0, 0, 0, 0.6);
+  flex-shrink: 0;
+}
+
+.page-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+// ── Loading ────────────────────────────────────────────────────────────────────
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+// ── Cards ─────────────────────────────────────────────────────────────────────
+.form-card {
+  margin-bottom: 16px;
+}
+
+.card-title-icon {
+  vertical-align: middle;
+  margin-right: 8px;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #6750a4;
+}
+
+mat-card-header {
+  margin-bottom: 8px;
+}
+
+mat-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// ── Form fields ───────────────────────────────────────────────────────────────
+.full-width {
+  width: 100%;
+}
+
+.half-width {
+  width: 50%;
+
+  @media (max-width: 600px) {
+    width: 100%;
+  }
+}
+
+.datetime-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Errores del formulario ────────────────────────────────────────────────────
+.form-error-msg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #c0392b;
+  font-size: 13px;
+  margin: -4px 0 4px;
+
+  mat-icon {
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+  }
+}
+
+// ── Toggle ────────────────────────────────────────────────────────────────────
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+
+.toggle-hint {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+// ── Mapa ──────────────────────────────────────────────────────────────────────
+.map-instruction {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+}
+
+.map-container {
+  width: 100%;
+  height: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  cursor: crosshair;
+}
+
+.coords-display {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
+  font-family: monospace;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: -4px 0;
+}
+
+// ── Acciones ──────────────────────────────────────────────────────────────────
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+
+  @media (max-width: 480px) {
+    flex-direction: column-reverse;
+    button, a { width: 100%; }
+  }
+}
+
+.btn-spinner {
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+.inline-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}
+
+// ── Mobile ────────────────────────────────────────────────────────────────────
+@media (max-width: 600px) {
+  .form-page {
+    padding: 12px 12px 40px;
+  }
+
+  .page-title {
+    font-size: 1.3rem;
+  }
+
+  .map-container {
+    height: 320px;
+  }
+}
