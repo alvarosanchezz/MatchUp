@@ -11,11 +11,9 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { DatePipe } from '@angular/common';
 import * as L from 'leaflet';
 
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MeetupCardComponent } from '../../shared/components/meetup-card.component';
 import { MatSelectModule } from '@angular/material/select';
@@ -70,10 +68,8 @@ export const ESTADO_LABELS: Record<EstadoQuedada, string> = {
   imports: [
     RouterLink,
     ReactiveFormsModule,
-    DatePipe,
     MeetupCardComponent,
     MatTabsModule,
-    MatCardModule,
     MatButtonModule,
     MatSelectModule,
     MatDatepickerModule,
