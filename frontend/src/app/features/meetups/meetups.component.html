@@ -100,45 +100,7 @@
       } @else {
         <div class="cards-grid">
           @for (meetup of meetups(); track meetup.id) {
-            <mat-card class="meetup-card" (click)="goToDetail(meetup.id)">
-              <mat-card-header>
-                <div class="card-header-content">
-                  <div>
-                    <mat-card-title>{{ meetup.nombreDeporte }}</mat-card-title>
-                    <mat-card-subtitle>
-                      {{ meetup.fechaHoraInicio | date: 'dd/MM/yyyy HH:mm' }}
-                    </mat-card-subtitle>
-                  </div>
-                  <span [class]="'estado-badge ' + stateClass(meetup.estado)">
-                    {{ stateLabel(meetup.estado) }}
-                  </span>
-                </div>
-              </mat-card-header>
-
-              <mat-card-content>
-                <p class="card-row">
-                  <mat-icon class="card-icon">place</mat-icon>
-                  {{ meetup.ubicacionNombre }}
-                </p>
-                <p class="card-row">
-                  <mat-icon class="card-icon">group</mat-icon>
-                  {{ meetup.numParticipantesActivos }} / {{ meetup.numJugadoresTotal }} jugadores
-                </p>
-                @if (meetup.descripcion) {
-                  <p class="card-description">{{ meetup.descripcion }}</p>
-                }
-              </mat-card-content>
-
-              <mat-card-actions align="end">
-                <button
-                  mat-button
-                  color="primary"
-                  (click)="goToDetail(meetup.id); $event.stopPropagation()"
-                >
-                  Ver detalle
-                </button>
-              </mat-card-actions>
-            </mat-card>
+            <app-meetup-card [meetup]="meetup" (cardClick)="goToDetail($event)" />
           }
         </div>
 

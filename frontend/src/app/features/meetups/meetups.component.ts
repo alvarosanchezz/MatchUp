@@ -17,6 +17,7 @@ import * as L from 'leaflet';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { MeetupCardComponent } from '../../shared/components/meetup-card.component';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
@@ -70,6 +71,7 @@ export const ESTADO_LABELS: Record<EstadoQuedada, string> = {
     RouterLink,
     ReactiveFormsModule,
     DatePipe,
+    MeetupCardComponent,
     MatTabsModule,
     MatCardModule,
     MatButtonModule,

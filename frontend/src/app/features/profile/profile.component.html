@@ -1,0 +1,234 @@
+<div class="profile-page">
+
+  <!-- ── User header ── -->
+  @if (currentUser(); as user) {
+    <div class="user-header">
+      <div class="user-avatar">
+        @if (user.urlFotoPerfil) {
+          <img [src]="user.urlFotoPerfil" [alt]="user.nombre" class="avatar-img" />
+        } @else {
+          <span class="avatar-initials">{{ initials(user.nombre) }}</span>
+        }
+      </div>
+
+      <div class="user-info">
+        <h1 class="user-name">{{ user.nombre }}</h1>
+        <p class="user-email">{{ user.email }}</p>
+
+        <div class="fiabilidad-row">
+          <span class="fiabilidad-label">Fiabilidad:</span>
+          <span class="fiabilidad-score" [class]="scoreClass()">
+            {{ user.fiabilidadScore | number:'1.0-0' }}%
+          </span>
+          <div class="score-bar-track">
+            <div
+              class="score-bar-fill"
+              [class]="scoreClass()"
+              [style.width.%]="user.fiabilidadScore">
+            </div>
+          </div>
+        </div>
+
+        <p class="member-since">
+          <mat-icon class="meta-icon">calendar_today</mat-icon>
+          Miembro desde {{ user.fechaRegistro | date:'MMMM yyyy' }}
+        </p>
+      </div>
+    </div>
+  }
+
+  <!-- ── Main tabs ── -->
+  <mat-tab-group animationDuration="200ms" (selectedIndexChange)="onOuterTabChange($event)">
+
+    <!-- ══ Tab 1: Datos personales ══ -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">person</mat-icon>
+        Datos
+      </ng-template>
+
+      <div class="tab-content">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>Datos personales</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
+
+              <mat-form-field class="full-width">
+                <mat-label>Nombre *</mat-label>
+                <input matInput formControlName="nombre" />
+                @if (profileForm.get('nombre')?.hasError('required') && profileForm.get('nombre')?.touched) {
+                  <mat-error>El nombre es obligatorio</mat-error>
+                }
+                @if (profileForm.get('nombre')?.hasError('minlength') && profileForm.get('nombre')?.touched) {
+                  <mat-error>Mínimo 2 caracteres</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field class="full-width">
+                <mat-label>URL foto de perfil</mat-label>
+                <input matInput formControlName="urlFotoPerfil" placeholder="https://…" />
+                <mat-hint>Pega la URL de tu foto de perfil</mat-hint>
+              </mat-form-field>
+
+              <div class="location-section">
+                <p class="section-label">
+                  <mat-icon class="meta-icon">place</mat-icon>
+                  Mi ubicación (para filtros de distancia)
+                </p>
+                <div class="location-actions">
+                  <button mat-stroked-button type="button" (click)="useMyLocation()">
+                    <mat-icon>my_location</mat-icon>
+                    {{ locationSet() ? 'Actualizar ubicación' : 'Usar mi ubicación' }}
+                  </button>
+                  @if (locationSet()) {
+                    <button mat-icon-button type="button" matTooltip="Borrar ubicación" (click)="clearLocation()">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  }
+                </div>
+                @if (locationSet()) {
+                  <p class="coords-display">
+                    <mat-icon class="meta-icon">gps_fixed</mat-icon>
+                    {{ coordsDisplay() }}
+                  </p>
+                }
+              </div>
+
+              <div class="form-actions">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="savingProfile()">
+                  @if (savingProfile()) {
+                    <mat-spinner diameter="18" class="btn-spinner" />
+                  } @else {
+                    <mat-icon>save</mat-icon>
+                  }
+                  Guardar datos
+                </button>
+              </div>
+
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- ══ Tab 2: Mis deportes ══ -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">sports</mat-icon>
+        Deportes
+      </ng-template>
+
+      <div class="tab-content">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>Mis deportes</mat-card-title>
+            <div class="card-header-action">
+              <button
+                mat-raised-button
+                color="primary"
+                (click)="openAddSportDialog()"
+                [disabled]="savingSports()">
+                <mat-icon>add</mat-icon>
+                Añadir deporte
+              </button>
+            </div>
+          </mat-card-header>
+
+          <mat-card-content>
+            @if (savingSports()) {
+              <div class="loading-row">
+                <mat-spinner diameter="32" />
+              </div>
+            } @else if (sports().length === 0) {
+              <div class="empty-sports">
+                <mat-icon>sports</mat-icon>
+                <p>Aún no tienes deportes añadidos</p>
+                <button mat-stroked-button (click)="openAddSportDialog()">
+                  Añadir mi primer deporte
+                </button>
+              </div>
+            } @else {
+              <div class="sports-list">
+                @for (sport of sports(); track sport.idDeporte; let last = $last) {
+                  <div class="sport-row">
+                    <div class="sport-info">
+                      <span class="sport-name">{{ sport.nombreDeporte }}</span>
+                      <span class="sport-stars">{{ nivelStars(sport.nivel) }}</span>
+                      <span class="sport-level">{{ nivelLabel(sport.nivel) }}</span>
+                      @if (sport.rolPreferido) {
+                        <span class="sport-role">· {{ sport.rolPreferido }}</span>
+                      }
+                    </div>
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      matTooltip="Eliminar deporte"
+                      (click)="removeSport(sport.idDeporte)">
+                      <mat-icon>delete_outline</mat-icon>
+                    </button>
+                  </div>
+                  @if (!last) { <mat-divider /> }
+                }
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- ══ Tab 3: Mis quedadas ══ -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">event</mat-icon>
+        Mis quedadas
+      </ng-template>
+
+      <div class="tab-content">
+        <mat-tab-group
+          animationDuration="150ms"
+          (selectedIndexChange)="onMeetupRoleTabChange($event)"
+          class="inner-tabs">
+
+          <mat-tab label="Organizadas" />
+          <mat-tab label="Apuntadas" />
+          <mat-tab label="Todas" />
+
+        </mat-tab-group>
+
+        @if (myMeetupsLoading()) {
+          <div class="loading-row">
+            <mat-spinner diameter="40" />
+          </div>
+        } @else if (myMeetups().length === 0) {
+          <div class="empty-meetups">
+            <mat-icon>event_busy</mat-icon>
+            <p>No tienes quedadas en esta categoría</p>
+            <a mat-stroked-button routerLink="/meetups">Ver todas las quedadas</a>
+          </div>
+        } @else {
+          <div class="meetups-grid">
+            @for (meetup of myMeetups(); track meetup.id) {
+              <app-meetup-card [meetup]="meetup" (cardClick)="goToMeetup($event)" />
+            }
+          </div>
+
+          <mat-paginator
+            [length]="myMeetupsTotal()"
+            [pageSize]="myMeetupsPageSize"
+            [pageIndex]="myMeetupsPage()"
+            [pageSizeOptions]="[20]"
+            (page)="onMeetupsPageChange($event)"
+            hidePageSize
+            showFirstLastButtons />
+        }
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+</div>
