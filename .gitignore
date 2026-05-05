@@ -69,3 +69,4 @@ postman/*.environment.local.json
 *.key
 *.p12
 secrets/
+/.metadata/

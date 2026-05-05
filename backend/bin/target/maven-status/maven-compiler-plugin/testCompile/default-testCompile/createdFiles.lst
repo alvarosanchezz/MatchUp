@@ -1,0 +1,7 @@
+com\matchup\participation\service\ParticipacionServiceTest.class
+com\matchup\sport\service\DeporteServiceTest.class
+com\matchup\auth\service\AuthServiceTest.class
+com\matchup\meetup\service\QuedadaServiceTest.class
+com\matchup\comment\service\ComentarioServiceTest.class
+com\matchup\integration\FullFlowIntegrationTest.class
+com\matchup\rating\service\RatingServiceTest.class

@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, inject, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { MatCardModule } from '@angular/material/card';
@@ -20,6 +20,7 @@ const NIVEL_LABELS = ['', 'Principiante', 'Amateur', 'Intermedio', 'Avanzado', '
   standalone: true,
   imports: [
     DatePipe,
+    DecimalPipe,
     MatCardModule,
     MatButtonModule,
     MatIconModule,

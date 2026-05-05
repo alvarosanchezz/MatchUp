@@ -20,7 +20,6 @@ import {
   Validators,
 } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { DatePipe } from '@angular/common';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, of } from 'rxjs';
 import * as L from 'leaflet';
 
@@ -107,7 +106,6 @@ interface NominatimResult {
   imports: [
     RouterLink,
     ReactiveFormsModule,
-    DatePipe,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
