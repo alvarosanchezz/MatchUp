@@ -45,8 +45,9 @@ spring:
       mail.smtp.starttls.enable: true
 
 # ── Servidor ──
+# Railway inyecta PORT; SERVER_PORT es para despliegues propios; default 8080
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${PORT:${SERVER_PORT:8080}}
   servlet:
     context-path: /
 
@@ -56,6 +57,10 @@ app:
     secret: ${JWT_SECRET:dev-secret-key-change-this-in-production-must-be-at-least-256-bits}
     expiration-ms: ${JWT_EXPIRATION_MS:900000}          # 15 min
     refresh-expiration-ms: ${JWT_REFRESH_MS:604800000}  # 7 días
+  cors:
+    # Lista separada por comas de orígenes permitidos (soporta patrones con *)
+    # En producción sobreescribir con la URL real de Vercel
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost,https://*.vercel.app}
 
 # ── Springdoc ──
 springdoc:

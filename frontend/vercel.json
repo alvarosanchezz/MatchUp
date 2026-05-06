@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "buildCommand": "sed -i \"s|http://localhost:8080|$NG_APP_API_BASE|g\" src/environments/environment.ts && npm run build",
+  "outputDirectory": "dist/frontend/browser",
+  "framework": null
+}
