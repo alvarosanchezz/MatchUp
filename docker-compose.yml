@@ -28,9 +28,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DB_HOST:                db
-      DB_PORT:                5432
-      DB_NAME:                ${DB_NAME:-matchup_db}
+      DB_URL:                 jdbc:postgresql://db:5432/${DB_NAME:-matchup_db}
       DB_USER:                ${DB_USER:-matchup_user}
       DB_PASS:                ${DB_PASS:-matchup_pass}
       JWT_SECRET:             ${JWT_SECRET:-dev-secret-key-change-in-production-min-256-bits}
