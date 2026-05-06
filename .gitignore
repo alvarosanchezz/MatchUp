@@ -64,6 +64,11 @@ postman/*.environment.local.json
 *.swp
 *~
 
+# ─── Docker ──────────────────────────────────────────────────
+.env
+.env.local
+.env.production
+
 # ─── Datos sensibles ─────────────────────────────────────────
 *.pem
 *.key
