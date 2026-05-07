@@ -117,7 +117,7 @@
           </button>
           @if (form.get('confirmarPassword')!.touched) {
             @if (form.get('confirmarPassword')!.hasError('required')) {
-              <mat-error>Confirma la contraseña</mat-error>
+              <mat-error>Este campo es obligatorio</mat-error>
             } @else if (form.hasError('passwordMismatch')) {
               <mat-error>Las contraseñas no coinciden</mat-error>
             }
