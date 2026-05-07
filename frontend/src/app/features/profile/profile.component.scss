@@ -1,152 +1,352 @@
+// ── Page ──────────────────────────────────────────────────────────────────────
 .profile-page {
-  padding: 24px;
   max-width: 900px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: apex-fade-up 0.3s ease both;
 }
 
-// ── User header ────────────────────────────────────────────────────────────────
-.user-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 24px;
-  margin-bottom: 28px;
-  padding: 24px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-}
-
-.user-avatar {
-  flex-shrink: 0;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: #6750a4;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+// ── Athlete hero ──────────────────────────────────────────────────────────────
+.athlete-hero {
+  background: linear-gradient(135deg, #0f0c29 0%, #1e1b4b 50%, #0a1628 100%);
+  border-radius: var(--radius-xl);
+  padding: 32px 36px;
+  position: relative;
   overflow: hidden;
 }
 
-.avatar-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero-orb-1 {
+  top: -60px; right: -60px;
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, rgba(0,102,204,0.25) 0%, transparent 70%);
+}
+.hero-orb-2 {
+  bottom: -40px; left: 30%;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(124,61,255,0.15) 0%, transparent 70%);
 }
 
-.avatar-initials {
-  color: white;
-  font-size: 28px;
-  font-weight: 700;
-}
-
-.user-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.user-name {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0 0 2px;
-}
-
-.user-email {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.55);
-  margin: 0 0 12px;
-}
-
-.fiabilidad-row {
+.hero-inner {
+  position: relative;
+  z-index: 1;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
   flex-wrap: wrap;
 }
 
-.fiabilidad-label {
+.hero-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+// ── Avatar ring ───────────────────────────────────────────────────────────────
+.avatar-ring {
+  flex-shrink: 0;
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  padding: 3px;
+
+  &.score-green { background: linear-gradient(135deg, #22c55e, #16a34a); }
+  &.score-amber { background: linear-gradient(135deg, #f97316, #ea580c); }
+  &.score-red   { background: linear-gradient(135deg, #ef4444, #dc2626); }
+}
+
+.athlete-avatar {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--apex-blue), #7B61E8);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  border: 3px solid #1e1b4b;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+
+  span {
+    font-size: 26px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -1px;
+    user-select: none;
+  }
+}
+
+// ── Identity ──────────────────────────────────────────────────────────────────
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius-full);
+  padding: 4px 12px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  font-weight: 500;
+  margin-bottom: 10px;
+  letter-spacing: 0.2px;
+}
+
+.hero-badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--apex-success);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(1.3); }
+}
+
+.athlete-name {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 800;
+  color: white;
+  margin: 0 0 4px;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+
+.athlete-email {
   font-size: 13px;
-  color: rgba(0, 0, 0, 0.6);
+  color: rgba(255,255,255,0.45);
+  margin: 0 0 14px;
 }
 
-.fiabilidad-score {
-  font-size: 14px;
-  font-weight: 700;
-  min-width: 44px;
-
-  &.score-green  { color: #166534; }
-  &.score-amber  { color: #9a3412; }
-  &.score-red    { color: #991b1b; }
+.athlete-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.score-bar-track {
-  flex: 1;
-  min-width: 100px;
-  max-width: 180px;
-  height: 8px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-full);
+  padding: 4px 12px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  font-weight: 500;
+
+  mat-icon { font-size: 13px; width: 13px; height: 13px; }
+}
+
+// ── Score panel ───────────────────────────────────────────────────────────────
+.hero-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding-top: 8px;
+}
+
+.score-badge {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  padding: 12px 20px;
+  border-radius: var(--radius-lg);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+
+  &.score-green {
+    border-color: rgba(34,197,94,0.4);
+    background: rgba(34,197,94,0.1);
+    .score-big, .score-pct { color: #4ade80; }
+  }
+  &.score-amber {
+    border-color: rgba(249,115,22,0.4);
+    background: rgba(249,115,22,0.1);
+    .score-big, .score-pct { color: #fb923c; }
+  }
+  &.score-red {
+    border-color: rgba(239,68,68,0.4);
+    background: rgba(239,68,68,0.1);
+    .score-big, .score-pct { color: #f87171; }
+  }
+}
+
+.score-big {
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1;
+  color: rgba(255,255,255,0.8);
+}
+
+.score-pct {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+}
+
+.score-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.score-track {
+  width: 80px; height: 4px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 2px;
   overflow: hidden;
 }
 
-.score-bar-fill {
+.score-fill {
   height: 100%;
-  border-radius: 4px;
-  transition: width 0.4s ease;
+  border-radius: 2px;
+  transition: width 0.5s ease;
 
-  &.score-green  { background: #22c55e; }
-  &.score-amber  { background: #f97316; }
-  &.score-red    { background: #ef4444; }
+  &.score-green { background: #4ade80; }
+  &.score-amber { background: #fb923c; }
+  &.score-red   { background: #f87171; }
 }
 
-.member-since {
-  font-size: 13px;
-  color: rgba(0, 0, 0, 0.5);
-  margin: 0;
+// ── Profile tabs ──────────────────────────────────────────────────────────────
+.profile-tabs {
+  background: var(--apex-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--apex-ink-10);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.tab-icon {
+  font-size: 18px; width: 18px; height: 18px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.tab-pane {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+// ── Settings card ─────────────────────────────────────────────────────────────
+.settings-card {
+  border: 1px solid var(--apex-ink-10);
+  border-radius: var(--radius-lg);
+  background: var(--apex-surface);
+  overflow: hidden;
+}
+
+.settings-card-header {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 14px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--apex-ink-10);
 }
 
-// ── Tab icons ──────────────────────────────────────────────────────────────────
-.tab-icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-  margin-right: 6px;
-  vertical-align: middle;
+.settings-card-icon {
+  width: 40px; height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--apex-blue-light);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon { color: var(--apex-blue); font-size: 20px; width: 20px; height: 20px; }
+
+  &.energy-icon {
+    background: #FFF3E0;
+    mat-icon { color: #E65100; }
+  }
 }
 
-// ── Tab content padding ────────────────────────────────────────────────────────
-.tab-content {
-  padding: 20px 0;
+.settings-card-title-group { flex: 1; min-width: 0; }
+
+.settings-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--apex-ink);
+  margin: 0 0 2px;
+}
+
+.settings-card-sub {
+  font-size: 13px;
+  color: var(--apex-ink-40);
+  margin: 0;
+}
+
+.add-sport-btn {
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 // ── Profile form ───────────────────────────────────────────────────────────────
 .profile-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 4px;
+  padding: 20px 24px;
 }
 
-.full-width {
-  width: 100%;
+.full-width { width: 100%; }
+
+.location-card {
+  border: 1px solid var(--apex-ink-10);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  background: var(--apex-bg);
+  margin: 8px 0 20px;
 }
 
-.section-label {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.65);
+.location-card-header {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin: 4px 0 8px;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  > mat-icon {
+    color: var(--apex-blue);
+    font-size: 20px; width: 20px; height: 20px;
+    flex-shrink: 0;
+  }
 }
 
-.location-section {
-  padding: 12px;
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 8px;
+.location-card-text { flex: 1; min-width: 0; }
+
+.location-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--apex-ink);
+  margin: 0 0 2px;
+}
+
+.location-sub {
+  font-size: 12px;
+  color: var(--apex-ink-40);
+  margin: 0;
+}
+
+.location-active-badge {
+  padding: 3px 10px;
+  background: var(--apex-success-bg);
+  color: #1a7a2e;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
 }
 
 .location-actions {
@@ -155,20 +355,33 @@
   gap: 8px;
 }
 
-.coords-display {
-  font-size: 12px;
-  color: rgba(0, 0, 0, 0.5);
-  font-family: monospace;
-  display: flex;
+.location-btn-active {
+  border-color: var(--apex-blue) !important;
+  color: var(--apex-blue) !important;
+  background: var(--apex-blue-light) !important;
+}
+
+.coords-chip {
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  margin: 8px 0 0;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--apex-ink-60);
+  font-family: 'Courier New', monospace;
+  margin: 10px 0 0;
+
+  mat-icon { font-size: 13px; width: 13px; height: 13px; color: var(--apex-blue); }
 }
 
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 8px;
+}
+
+.save-btn {
+  min-width: 160px;
+  height: 44px;
+  font-weight: 600 !important;
 }
 
 .btn-spinner {
@@ -177,36 +390,8 @@
   vertical-align: middle;
 }
 
-// ── Sports tab ─────────────────────────────────────────────────────────────────
-.card-header-action {
-  margin-left: auto;
-}
-
-.loading-row {
-  display: flex;
-  justify-content: center;
-  padding: 32px;
-}
-
-.empty-sports,
-.empty-meetups {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 48px 16px;
-  color: rgba(0, 0, 0, 0.4);
-
-  mat-icon {
-    font-size: 56px;
-    width: 56px;
-    height: 56px;
-  }
-
-  p { margin: 0; font-size: 15px; }
-}
-
-.sports-list {
+// ── Sports list ───────────────────────────────────────────────────────────────
+.sports-list-rows {
   display: flex;
   flex-direction: column;
 }
@@ -214,44 +399,110 @@
 .sport-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 4px;
+  gap: 14px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--apex-ink-10);
+  transition: background var(--t-fast);
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: var(--apex-bg); }
 }
 
-.sport-info {
+.sport-row-icon {
+  width: 38px; height: 38px;
+  border-radius: var(--radius-md);
+  background: #FFF3E0;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon { color: #E65100; font-size: 18px; width: 18px; height: 18px; }
+}
+
+.sport-row-body { flex: 1; min-width: 0; }
+
+.sport-row-name {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--apex-ink);
+  margin-bottom: 4px;
+}
+
+.sport-row-meta {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
-.sport-name {
-  font-weight: 600;
-  font-size: 15px;
-}
-
 .sport-stars {
-  font-size: 16px;
+  font-size: 13px;
   letter-spacing: 1px;
   color: #f59e0b;
 }
 
-.sport-level {
-  font-size: 13px;
-  color: rgba(0, 0, 0, 0.55);
+.sport-level-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--apex-blue);
+  background: var(--apex-blue-light);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
 }
 
 .sport-role {
-  font-size: 13px;
-  color: rgba(0, 0, 0, 0.45);
+  font-size: 12px;
+  color: var(--apex-ink-40);
   font-style: italic;
 }
 
-// ── Mis quedadas tab ──────────────────────────────────────────────────────────
-.inner-tabs {
-  margin-bottom: 16px;
+.sport-delete-btn {
+  color: var(--apex-error) !important;
+  opacity: 0.6;
+  transition: opacity var(--t-fast);
+  flex-shrink: 0;
+
+  &:hover { opacity: 1; }
 }
 
+// ── Loading ───────────────────────────────────────────────────────────────────
+.loading-row {
+  display: flex;
+  justify-content: center;
+  padding: 48px 24px;
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 24px;
+  text-align: center;
+}
+
+.empty-icon-wrap {
+  width: 72px; height: 72px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--apex-blue-light), #E0EDFF);
+  display: flex; align-items: center; justify-content: center;
+
+  mat-icon { font-size: 36px; width: 36px; height: 36px; color: var(--apex-blue); }
+}
+
+.empty-text {
+  h3 { font-size: 17px; font-weight: 700; color: var(--apex-ink); margin: 0 0 6px; }
+  p  { font-size: 14px; color: var(--apex-ink-40); margin: 0; line-height: 1.6; }
+}
+
+// ── Inner tabs ────────────────────────────────────────────────────────────────
+.inner-tabs {
+  border-bottom: 1px solid var(--apex-ink-10);
+  margin-bottom: 20px;
+}
+
+// ── Meetups grid ──────────────────────────────────────────────────────────────
 .meetups-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -259,42 +510,36 @@
   margin-bottom: 16px;
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────────
-.meta-icon {
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
-  vertical-align: middle;
-  color: rgba(0, 0, 0, 0.45);
-}
+// ── Mobile ────────────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .profile-page { gap: 14px; }
 
-// ── Mobile ─────────────────────────────────────────────────────────────────────
-@media (max-width: 600px) {
-  .profile-page {
-    padding: 12px;
-  }
+  .athlete-hero { padding: 24px 20px; border-radius: var(--radius-lg); }
+  .hero-inner   { flex-direction: column; gap: 20px; }
+  .hero-left    { gap: 14px; }
 
-  .user-header {
-    flex-direction: column;
+  .hero-score {
+    flex-direction: row;
     align-items: center;
-    text-align: center;
-    padding: 16px;
+    gap: 16px;
+    padding-top: 0;
+    width: 100%;
   }
+  .score-track { width: 60px; }
 
-  .user-avatar {
-    width: 64px;
-    height: 64px;
-  }
+  .avatar-ring { width: 72px; height: 72px; }
+  .athlete-name { font-size: 1.3rem; }
 
-  .avatar-initials { font-size: 22px; }
+  .settings-card-header { flex-wrap: wrap; gap: 10px; padding: 16px; }
+  .add-sport-btn { width: 100%; }
 
-  .fiabilidad-row {
-    justify-content: center;
-  }
+  .tab-pane { padding: 14px 12px; }
+  .profile-form { padding: 14px 12px; }
 
-  .meetups-grid {
-    grid-template-columns: 1fr;
-  }
+  .sport-row { padding: 12px 16px; }
 
-  .form-actions { justify-content: stretch; button { width: 100%; } }
+  .meetups-grid { grid-template-columns: 1fr; }
+
+  .form-actions { justify-content: stretch; }
+  .save-btn { width: 100%; }
 }

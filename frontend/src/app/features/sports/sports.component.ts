@@ -39,69 +39,133 @@ import {
     MatTooltipModule,
   ],
   styles: [`
+    :host { display: block; }
     .sports-page {
-      padding: 24px;
       max-width: 800px;
       margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      animation: apex-fade-up 0.3s ease both;
     }
-    .page-header {
+    /* Page hero */
+    .page-hero {
+      background: linear-gradient(135deg, #0f0c29 0%, #1e1b4b 50%, #0a1628 100%);
+      border-radius: var(--radius-xl);
+      padding: 28px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+      position: relative;
+      overflow: hidden;
     }
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      top: -50px; right: -50px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,102,204,0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-text { position: relative; z-index: 1; }
     .page-title {
-      font-size: 1.75rem;
-      font-weight: 600;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 800;
+      color: white;
+      margin: 0 0 4px;
+      letter-spacing: -0.5px;
+    }
+    .page-subtitle {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
       margin: 0;
+    }
+    .new-btn {
+      flex-shrink: 0;
+      background: white !important;
+      color: var(--apex-ink) !important;
+      font-weight: 700 !important;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25) !important;
+      position: relative; z-index: 1;
+    }
+    /* Content card */
+    .content-card {
+      background: var(--apex-surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--apex-ink-10);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
     }
     .loading-container {
       display: flex;
       justify-content: center;
       padding: 64px 0;
     }
+    /* Empty state */
     .empty-state {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
       padding: 64px 16px;
-      color: rgba(0,0,0,0.45);
       text-align: center;
     }
-    .empty-state mat-icon {
-      font-size: 64px;
-      width: 64px;
-      height: 64px;
+    .empty-icon-wrap {
+      width: 72px; height: 72px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, var(--apex-blue-light), #E0EDFF);
+      display: flex; align-items: center; justify-content: center;
     }
-    .sports-list {
-      display: flex;
-      flex-direction: column;
+    .empty-icon-wrap mat-icon {
+      font-size: 36px; width: 36px; height: 36px;
+      color: var(--apex-blue);
     }
+    .empty-state p {
+      font-size: 14px;
+      color: var(--apex-ink-40);
+      margin: 0;
+    }
+    /* Sports list */
+    .sports-list { display: flex; flex-direction: column; }
     .sport-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 14px 16px;
-      gap: 12px;
+      padding: 14px 24px;
+      gap: 14px;
+      border-bottom: 1px solid var(--apex-ink-10);
+      transition: background 0.15s;
     }
-    .sport-info {
-      flex: 1;
-      min-width: 0;
+    .sport-row:last-child { border-bottom: none; }
+    .sport-row:hover { background: var(--apex-bg); }
+    .sport-row-icon {
+      width: 38px; height: 38px;
+      border-radius: var(--radius-md);
+      background: #FFF3E0;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
     }
+    .sport-row-icon mat-icon {
+      color: #E65100; font-size: 18px; width: 18px; height: 18px;
+    }
+    .sport-info { flex: 1; min-width: 0; }
     .sport-name {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
-      margin: 0 0 2px;
+      color: var(--apex-ink);
+      margin: 0 0 3px;
     }
     .sport-meta {
-      font-size: 13px;
-      color: rgba(0,0,0,0.55);
+      font-size: 12px;
+      color: var(--apex-ink-40);
       margin: 0 0 2px;
+      display: flex; align-items: center; gap: 4px;
     }
     .sport-desc {
-      font-size: 13px;
-      color: rgba(0,0,0,0.45);
+      font-size: 12px;
+      color: var(--apex-ink-40);
       margin: 0;
       white-space: nowrap;
       overflow: hidden;
@@ -115,14 +179,14 @@ import {
     }
     /* Inline add/edit form */
     .edit-form {
-      padding: 16px;
-      background: rgba(103,80,164,0.04);
-      border-radius: 8px;
-      margin-bottom: 8px;
+      padding: 16px 24px;
+      background: var(--apex-blue-light);
+      border-bottom: 1px solid var(--apex-ink-10);
     }
     .edit-form-title {
-      font-size: 15px;
-      font-weight: 600;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--apex-ink);
       margin: 0 0 12px;
     }
     .form-row {
@@ -138,21 +202,27 @@ import {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
-      margin-top: 8px;
+      margin-top: 4px;
     }
     @media (max-width: 600px) {
-      .sports-page { padding: 12px; }
-      .page-title { font-size: 1.3rem; }
+      .sports-page { gap: 14px; }
+      .page-hero { padding: 20px 20px; border-radius: var(--radius-lg); }
+      .sport-row { padding: 12px 16px; }
       .sport-desc { max-width: 200px; }
+      .new-btn { width: 100%; justify-content: center; }
     }
   `],
   template: `
     <div class="sports-page">
-      <!-- Header -->
-      <div class="page-header">
-        <h1 class="page-title">Deportes</h1>
+
+      <!-- Hero -->
+      <div class="page-hero">
+        <div class="hero-text">
+          <h1 class="page-title">Deportes</h1>
+          <p class="page-subtitle">Catálogo de deportes disponibles en la plataforma</p>
+        </div>
         @if (isAdmin()) {
-          <button mat-raised-button color="primary" (click)="openAddForm()">
+          <button mat-raised-button class="new-btn" (click)="openAddForm()">
             <mat-icon>add</mat-icon>
             Añadir deporte
           </button>
@@ -161,72 +231,76 @@ import {
 
       <!-- Inline add form -->
       @if (showAddForm()) {
-        <div class="edit-form">
-          <p class="edit-form-title">Nuevo deporte</p>
-          <form [formGroup]="sportForm" (ngSubmit)="submitAdd()">
-            <div class="form-row">
-              <mat-form-field class="field-name">
-                <mat-label>Nombre</mat-label>
-                <input matInput formControlName="nombre" />
-                @if (sportForm.get('nombre')?.hasError('required') && sportForm.get('nombre')?.touched) {
-                  <mat-error>El nombre es obligatorio</mat-error>
-                }
-              </mat-form-field>
-              <mat-form-field class="field-players">
-                <mat-label>Jugadores por defecto</mat-label>
-                <input matInput type="number" formControlName="jugadoresDefault" min="1" />
-                @if (sportForm.get('jugadoresDefault')?.hasError('required') && sportForm.get('jugadoresDefault')?.touched) {
-                  <mat-error>Campo obligatorio</mat-error>
-                }
-              </mat-form-field>
-              <mat-form-field class="field-desc">
-                <mat-label>Descripción (opcional)</mat-label>
-                <textarea matInput formControlName="descripcion" rows="2"></textarea>
-              </mat-form-field>
-            </div>
-            <div class="form-actions">
-              <button mat-button type="button" (click)="cancelForm()" [disabled]="saving()">Cancelar</button>
-              <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
-                @if (saving()) { <mat-spinner diameter="18" style="display:inline-block;margin-right:6px;vertical-align:middle" /> }
-                Guardar
-              </button>
-            </div>
-          </form>
+        <div class="content-card">
+          <div class="edit-form">
+            <p class="edit-form-title">Nuevo deporte</p>
+            <form [formGroup]="sportForm" (ngSubmit)="submitAdd()">
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="field-name">
+                  <mat-label>Nombre</mat-label>
+                  <input matInput formControlName="nombre" />
+                  @if (sportForm.get('nombre')?.hasError('required') && sportForm.get('nombre')?.touched) {
+                    <mat-error>El nombre es obligatorio</mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="field-players">
+                  <mat-label>Jugadores por defecto</mat-label>
+                  <input matInput type="number" formControlName="jugadoresDefault" min="1" />
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="field-desc">
+                  <mat-label>Descripción (opcional)</mat-label>
+                  <textarea matInput formControlName="descripcion" rows="2"></textarea>
+                </mat-form-field>
+              </div>
+              <div class="form-actions">
+                <button mat-button type="button" (click)="cancelForm()" [disabled]="saving()">Cancelar</button>
+                <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
+                  @if (saving()) { <mat-spinner diameter="18" style="display:inline-block;margin-right:6px;vertical-align:middle" /> }
+                  Guardar
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       }
 
       <!-- Loading -->
       @if (loading()) {
-        <div class="loading-container">
-          <mat-spinner diameter="48" />
+        <div class="content-card">
+          <div class="loading-container">
+            <mat-spinner diameter="44" />
+          </div>
         </div>
       } @else if (sports().length === 0) {
-        <div class="empty-state">
-          <mat-icon>sports</mat-icon>
-          <p>No hay deportes registrados todavía</p>
+        <div class="content-card">
+          <div class="empty-state">
+            <div class="empty-icon-wrap">
+              <mat-icon>sports</mat-icon>
+            </div>
+            <p>No hay deportes registrados todavía</p>
+          </div>
         </div>
       } @else {
-        <mat-card>
+        <div class="content-card">
           <div class="sports-list">
-            @for (sport of sports(); track sport.id; let last = $last) {
-              <!-- Inline edit form -->
+            @for (sport of sports(); track sport.id) {
               @if (editingId() === sport.id) {
-                <div class="edit-form" style="margin:8px 16px">
+                <div class="edit-form">
                   <p class="edit-form-title">Editar — {{ sport.nombre }}</p>
                   <form [formGroup]="sportForm" (ngSubmit)="submitEdit(sport.id)">
                     <div class="form-row">
-                      <mat-form-field class="field-name">
+                      <mat-form-field appearance="outline" class="field-name">
                         <mat-label>Nombre</mat-label>
                         <input matInput formControlName="nombre" />
                         @if (sportForm.get('nombre')?.hasError('required') && sportForm.get('nombre')?.touched) {
                           <mat-error>El nombre es obligatorio</mat-error>
                         }
                       </mat-form-field>
-                      <mat-form-field class="field-players">
+                      <mat-form-field appearance="outline" class="field-players">
                         <mat-label>Jugadores por defecto</mat-label>
                         <input matInput type="number" formControlName="jugadoresDefault" min="1" />
                       </mat-form-field>
-                      <mat-form-field class="field-desc">
+                      <mat-form-field appearance="outline" class="field-desc">
                         <mat-label>Descripción (opcional)</mat-label>
                         <textarea matInput formControlName="descripcion" rows="2"></textarea>
                       </mat-form-field>
@@ -242,10 +316,13 @@ import {
                 </div>
               } @else {
                 <div class="sport-row">
+                  <div class="sport-row-icon">
+                    <mat-icon>sports</mat-icon>
+                  </div>
                   <div class="sport-info">
                     <p class="sport-name">{{ sport.nombre }}</p>
                     <p class="sport-meta">
-                      <mat-icon style="font-size:14px;width:14px;height:14px;vertical-align:middle">group</mat-icon>
+                      <mat-icon style="font-size:13px;width:13px;height:13px">group</mat-icon>
                       {{ sport.jugadoresDefault }} jugadores por defecto
                     </p>
                     @if (sport.descripcion) {
@@ -254,26 +331,21 @@ import {
                   </div>
                   @if (isAdmin()) {
                     <div class="sport-actions">
-                      <button mat-icon-button
-                        matTooltip="Editar"
-                        (click)="openEditForm(sport)"
-                        [disabled]="saving()">
+                      <button mat-icon-button matTooltip="Editar"
+                        (click)="openEditForm(sport)" [disabled]="saving()">
                         <mat-icon>edit</mat-icon>
                       </button>
-                      <button mat-icon-button color="warn"
-                        matTooltip="Eliminar"
-                        (click)="deleteSport(sport)"
-                        [disabled]="saving()">
-                        <mat-icon>delete</mat-icon>
+                      <button mat-icon-button color="warn" matTooltip="Eliminar"
+                        (click)="deleteSport(sport)" [disabled]="saving()">
+                        <mat-icon>delete_outline</mat-icon>
                       </button>
                     </div>
                   }
                 </div>
               }
-              @if (!last) { <mat-divider /> }
             }
           </div>
-        </mat-card>
+        </div>
       }
     </div>
   `,

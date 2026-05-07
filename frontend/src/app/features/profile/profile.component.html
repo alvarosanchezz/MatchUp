@@ -1,44 +1,69 @@
 <div class="profile-page">
 
-  <!-- ── User header ── -->
+  <!-- ── Athlete hero ───────────────────────────────────────────────────────── -->
   @if (currentUser(); as user) {
-    <div class="user-header">
-      <div class="user-avatar">
-        @if (user.urlFotoPerfil) {
-          <img [src]="user.urlFotoPerfil" [alt]="user.nombre" class="avatar-img" />
-        } @else {
-          <span class="avatar-initials">{{ initials(user.nombre) }}</span>
-        }
-      </div>
+    <div class="athlete-hero">
+      <div class="hero-orb hero-orb-1"></div>
+      <div class="hero-orb hero-orb-2"></div>
 
-      <div class="user-info">
-        <h1 class="user-name">{{ user.nombre }}</h1>
-        <p class="user-email">{{ user.email }}</p>
+      <div class="hero-inner">
 
-        <div class="fiabilidad-row">
-          <span class="fiabilidad-label">Fiabilidad:</span>
-          <span class="fiabilidad-score" [class]="scoreClass()">
-            {{ user.fiabilidadScore | number:'1.0-0' }}%
-          </span>
-          <div class="score-bar-track">
-            <div
-              class="score-bar-fill"
-              [class]="scoreClass()"
-              [style.width.%]="user.fiabilidadScore">
+        <!-- Left: avatar + identity -->
+        <div class="hero-left">
+          <div class="avatar-ring" [class]="scoreClass()">
+            <div class="athlete-avatar">
+              @if (user.urlFotoPerfil) {
+                <img [src]="user.urlFotoPerfil" [alt]="user.nombre" />
+              } @else {
+                <span>{{ initials(user.nombre) }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="hero-identity">
+            <div class="hero-badge">
+              <span class="hero-badge-dot"></span>
+              Perfil deportivo
+            </div>
+            <h1 class="athlete-name">{{ user.nombre }}</h1>
+            <p class="athlete-email">{{ user.email }}</p>
+
+            <div class="athlete-pills">
+              <span class="meta-pill">
+                <mat-icon>calendar_today</mat-icon>
+                Desde {{ user.fechaRegistro | date:'MMM yyyy':'':'es-ES' }}
+              </span>
+              @if (sports().length > 0) {
+                <span class="meta-pill">
+                  <mat-icon>sports</mat-icon>
+                  {{ sports().length }} {{ sports().length === 1 ? 'deporte' : 'deportes' }}
+                </span>
+              }
             </div>
           </div>
         </div>
 
-        <p class="member-since">
-          <mat-icon class="meta-icon">calendar_today</mat-icon>
-          Miembro desde {{ user.fechaRegistro | date:'MMMM yyyy' }}
-        </p>
+        <!-- Right: fiabilidad score -->
+        <div class="hero-score">
+          <div class="score-badge" [class]="scoreClass()">
+            <span class="score-big">{{ user.fiabilidadScore | number:'1.0-0' }}</span>
+            <span class="score-pct">%</span>
+          </div>
+          <p class="score-label">Fiabilidad</p>
+          <div class="score-track">
+            <div class="score-fill" [class]="scoreClass()" [style.width.%]="user.fiabilidadScore"></div>
+          </div>
+        </div>
+
       </div>
     </div>
   }
 
-  <!-- ── Main tabs ── -->
-  <mat-tab-group animationDuration="200ms" (selectedIndexChange)="onOuterTabChange($event)">
+  <!-- ── Tabs ───────────────────────────────────────────────────────────────── -->
+  <mat-tab-group
+    animationDuration="200ms"
+    (selectedIndexChange)="onOuterTabChange($event)"
+    class="profile-tabs">
 
     <!-- ══ Tab 1: Datos personales ══ -->
     <mat-tab>
@@ -47,73 +72,84 @@
         Datos
       </ng-template>
 
-      <div class="tab-content">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>Datos personales</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
+      <div class="tab-pane">
+        <div class="settings-card">
 
-              <mat-form-field class="full-width">
-                <mat-label>Nombre *</mat-label>
-                <input matInput formControlName="nombre" />
-                @if (profileForm.get('nombre')?.hasError('required') && profileForm.get('nombre')?.touched) {
-                  <mat-error>El nombre es obligatorio</mat-error>
-                }
-                @if (profileForm.get('nombre')?.hasError('minlength') && profileForm.get('nombre')?.touched) {
-                  <mat-error>Mínimo 2 caracteres</mat-error>
-                }
-              </mat-form-field>
+          <div class="settings-card-header">
+            <div class="settings-card-icon">
+              <mat-icon>person_outline</mat-icon>
+            </div>
+            <div>
+              <h2 class="settings-card-title">Información personal</h2>
+              <p class="settings-card-sub">Actualiza tu nombre y foto de perfil</p>
+            </div>
+          </div>
 
-              <mat-form-field class="full-width">
-                <mat-label>URL foto de perfil</mat-label>
-                <input matInput formControlName="urlFotoPerfil" placeholder="https://…" />
-                <mat-hint>Pega la URL de tu foto de perfil</mat-hint>
-              </mat-form-field>
+          <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
 
-              <div class="location-section">
-                <p class="section-label">
-                  <mat-icon class="meta-icon">place</mat-icon>
-                  Mi ubicación (para filtros de distancia)
-                </p>
-                <div class="location-actions">
-                  <button mat-stroked-button type="button" (click)="useMyLocation()">
-                    <mat-icon>my_location</mat-icon>
-                    {{ locationSet() ? 'Actualizar ubicación' : 'Usar mi ubicación' }}
-                  </button>
-                  @if (locationSet()) {
-                    <button mat-icon-button type="button" matTooltip="Borrar ubicación" (click)="clearLocation()">
-                      <mat-icon>close</mat-icon>
-                    </button>
-                  }
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nombre</mat-label>
+              <mat-icon matPrefix>badge</mat-icon>
+              <input matInput formControlName="nombre" />
+              @if (profileForm.get('nombre')?.hasError('required') && profileForm.get('nombre')?.touched) {
+                <mat-error>El nombre es obligatorio</mat-error>
+              }
+              @if (profileForm.get('nombre')?.hasError('minlength') && profileForm.get('nombre')?.touched) {
+                <mat-error>Mínimo 2 caracteres</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>URL foto de perfil</mat-label>
+              <mat-icon matPrefix>image</mat-icon>
+              <input matInput formControlName="urlFotoPerfil" placeholder="https://…" />
+              <mat-hint>Enlace directo a tu foto</mat-hint>
+            </mat-form-field>
+
+            <div class="location-card">
+              <div class="location-card-header">
+                <mat-icon>place</mat-icon>
+                <div class="location-card-text">
+                  <p class="location-title">Mi ubicación</p>
+                  <p class="location-sub">Usada para filtrar quedadas cercanas</p>
                 </div>
                 @if (locationSet()) {
-                  <p class="coords-display">
-                    <mat-icon class="meta-icon">gps_fixed</mat-icon>
-                    {{ coordsDisplay() }}
-                  </p>
+                  <span class="location-active-badge">Activa</span>
                 }
               </div>
-
-              <div class="form-actions">
-                <button
-                  mat-raised-button
-                  color="primary"
-                  type="submit"
-                  [disabled]="savingProfile()">
-                  @if (savingProfile()) {
-                    <mat-spinner diameter="18" class="btn-spinner" />
-                  } @else {
-                    <mat-icon>save</mat-icon>
-                  }
-                  Guardar datos
+              <div class="location-actions">
+                <button mat-stroked-button type="button" (click)="useMyLocation()"
+                  [class.location-btn-active]="locationSet()">
+                  <mat-icon>{{ locationSet() ? 'gps_fixed' : 'my_location' }}</mat-icon>
+                  {{ locationSet() ? 'Actualizar' : 'Usar mi ubicación' }}
                 </button>
+                @if (locationSet()) {
+                  <button mat-icon-button type="button" matTooltip="Quitar ubicación" (click)="clearLocation()">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                }
               </div>
+              @if (locationSet()) {
+                <p class="coords-chip">
+                  <mat-icon>gps_fixed</mat-icon>
+                  {{ coordsDisplay() }}
+                </p>
+              }
+            </div>
 
-            </form>
-          </mat-card-content>
-        </mat-card>
+            <div class="form-actions">
+              <button mat-raised-button color="primary" type="submit" [disabled]="savingProfile()" class="save-btn">
+                @if (savingProfile()) {
+                  <mat-spinner diameter="18" class="btn-spinner" />
+                } @else {
+                  <mat-icon>check</mat-icon>
+                }
+                Guardar cambios
+              </button>
+            </div>
+
+          </form>
+        </div>
       </div>
     </mat-tab>
 
@@ -124,61 +160,71 @@
         Deportes
       </ng-template>
 
-      <div class="tab-content">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>Mis deportes</mat-card-title>
-            <div class="card-header-action">
-              <button
-                mat-raised-button
-                color="primary"
-                (click)="openAddSportDialog()"
-                [disabled]="savingSports()">
+      <div class="tab-pane">
+        <div class="settings-card">
+
+          <div class="settings-card-header">
+            <div class="settings-card-icon energy-icon">
+              <mat-icon>sports</mat-icon>
+            </div>
+            <div class="settings-card-title-group">
+              <h2 class="settings-card-title">Mis deportes</h2>
+              <p class="settings-card-sub">Deportes que practicas y tu nivel</p>
+            </div>
+            <button mat-raised-button color="primary"
+              (click)="openAddSportDialog()"
+              [disabled]="savingSports()"
+              class="add-sport-btn">
+              <mat-icon>add</mat-icon>
+              Añadir
+            </button>
+          </div>
+
+          @if (savingSports()) {
+            <div class="loading-row">
+              <mat-spinner diameter="36" />
+            </div>
+          } @else if (sports().length === 0) {
+            <div class="empty-state">
+              <div class="empty-icon-wrap">
+                <mat-icon>sports</mat-icon>
+              </div>
+              <div class="empty-text">
+                <h3>Sin deportes</h3>
+                <p>Añade los deportes que practicas<br>para que otros te encuentren</p>
+              </div>
+              <button mat-raised-button color="primary" (click)="openAddSportDialog()">
                 <mat-icon>add</mat-icon>
                 Añadir deporte
               </button>
             </div>
-          </mat-card-header>
-
-          <mat-card-content>
-            @if (savingSports()) {
-              <div class="loading-row">
-                <mat-spinner diameter="32" />
-              </div>
-            } @else if (sports().length === 0) {
-              <div class="empty-sports">
-                <mat-icon>sports</mat-icon>
-                <p>Aún no tienes deportes añadidos</p>
-                <button mat-stroked-button (click)="openAddSportDialog()">
-                  Añadir mi primer deporte
-                </button>
-              </div>
-            } @else {
-              <div class="sports-list">
-                @for (sport of sports(); track sport.idDeporte; let last = $last) {
-                  <div class="sport-row">
-                    <div class="sport-info">
-                      <span class="sport-name">{{ sport.nombreDeporte }}</span>
+          } @else {
+            <div class="sports-list-rows">
+              @for (sport of sports(); track sport.idDeporte) {
+                <div class="sport-row">
+                  <div class="sport-row-icon">
+                    <mat-icon>sports</mat-icon>
+                  </div>
+                  <div class="sport-row-body">
+                    <span class="sport-row-name">{{ sport.nombreDeporte }}</span>
+                    <div class="sport-row-meta">
                       <span class="sport-stars">{{ nivelStars(sport.nivel) }}</span>
-                      <span class="sport-level">{{ nivelLabel(sport.nivel) }}</span>
+                      <span class="sport-level-badge">{{ nivelLabel(sport.nivel) }}</span>
                       @if (sport.rolPreferido) {
-                        <span class="sport-role">· {{ sport.rolPreferido }}</span>
+                        <span class="sport-role">{{ sport.rolPreferido }}</span>
                       }
                     </div>
-                    <button
-                      mat-icon-button
-                      color="warn"
-                      matTooltip="Eliminar deporte"
-                      (click)="removeSport(sport.idDeporte)">
-                      <mat-icon>delete_outline</mat-icon>
-                    </button>
                   </div>
-                  @if (!last) { <mat-divider /> }
-                }
-              </div>
-            }
-          </mat-card-content>
-        </mat-card>
+                  <button mat-icon-button matTooltip="Eliminar" class="sport-delete-btn"
+                    (click)="removeSport(sport.idDeporte)">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+        </div>
       </div>
     </mat-tab>
 
@@ -189,16 +235,14 @@
         Mis quedadas
       </ng-template>
 
-      <div class="tab-content">
+      <div class="tab-pane">
         <mat-tab-group
           animationDuration="150ms"
           (selectedIndexChange)="onMeetupRoleTabChange($event)"
           class="inner-tabs">
-
           <mat-tab label="Organizadas" />
           <mat-tab label="Apuntadas" />
           <mat-tab label="Todas" />
-
         </mat-tab-group>
 
         @if (myMeetupsLoading()) {
@@ -206,10 +250,18 @@
             <mat-spinner diameter="40" />
           </div>
         } @else if (myMeetups().length === 0) {
-          <div class="empty-meetups">
-            <mat-icon>event_busy</mat-icon>
-            <p>No tienes quedadas en esta categoría</p>
-            <a mat-stroked-button routerLink="/meetups">Ver todas las quedadas</a>
+          <div class="empty-state">
+            <div class="empty-icon-wrap">
+              <mat-icon>event_busy</mat-icon>
+            </div>
+            <div class="empty-text">
+              <h3>Sin quedadas</h3>
+              <p>No tienes quedadas en esta categoría</p>
+            </div>
+            <a mat-stroked-button routerLink="/meetups">
+              <mat-icon>search</mat-icon>
+              Explorar quedadas
+            </a>
           </div>
         } @else {
           <div class="meetups-grid">
@@ -217,7 +269,6 @@
               <app-meetup-card [meetup]="meetup" (cardClick)="goToMeetup($event)" />
             }
           </div>
-
           <mat-paginator
             [length]="myMeetupsTotal()"
             [pageSize]="myMeetupsPageSize"
