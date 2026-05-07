@@ -1,50 +1,67 @@
 <div class="meetups-page">
-  <!-- ── Cabecera ── -->
-  <div class="page-header">
-    <h1 class="page-title">Quedadas</h1>
-    <a mat-raised-button color="primary" routerLink="/meetups/new">
-      <mat-icon>add</mat-icon>
-      Nueva quedada
-    </a>
+
+  <!-- ── Hero header ────────────────────────────────────────────────────── -->
+  <div class="page-hero">
+    <div class="hero-body">
+      <div>
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          Quedadas disponibles
+        </div>
+        <h1 class="page-title">Encuentra tu partido</h1>
+        <p class="page-subtitle">Únete a quedadas deportivas o crea la tuya cerca de ti</p>
+      </div>
+      <a mat-raised-button color="primary" routerLink="/meetups/new" class="new-btn">
+        <mat-icon>add</mat-icon>
+        Nueva quedada
+      </a>
+    </div>
   </div>
 
   <!-- ── Panel de filtros ── -->
-  <mat-expansion-panel class="filters-panel">
+  <mat-expansion-panel class="filters-panel" [expanded]="false">
     <mat-expansion-panel-header>
-      <mat-panel-title>
-        <mat-icon class="filter-icon">filter_list</mat-icon>
-        Filtros
+      <mat-panel-title class="filter-header-title">
+        <mat-icon class="filter-icon">tune</mat-icon>
+        Filtros de búsqueda
+        @if (locationSet()) {
+          <span class="filter-active-badge">📍 Ubicación activa</span>
+        }
       </mat-panel-title>
     </mat-expansion-panel-header>
 
     <form [formGroup]="filterForm" class="filter-form">
       <div class="filter-row">
-        <mat-form-field>
+        <mat-form-field appearance="outline">
           <mat-label>Deporte</mat-label>
+          <mat-icon matPrefix>sports</mat-icon>
           <mat-select formControlName="idDeporte">
-            <mat-option [value]="null">Todos</mat-option>
+            <mat-option [value]="null">Todos los deportes</mat-option>
             @for (sport of sports(); track sport.id) {
               <mat-option [value]="sport.id">{{ sport.nombre }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
 
-        <mat-form-field>
-          <mat-label>Fecha desde</mat-label>
+        <mat-form-field appearance="outline">
+          <mat-label>Desde</mat-label>
+          <mat-icon matPrefix>calendar_today</mat-icon>
           <input matInput [matDatepicker]="pickerDesde" formControlName="fechaDesde" />
           <mat-datepicker-toggle matIconSuffix [for]="pickerDesde" />
           <mat-datepicker #pickerDesde />
         </mat-form-field>
 
-        <mat-form-field>
-          <mat-label>Fecha hasta</mat-label>
+        <mat-form-field appearance="outline">
+          <mat-label>Hasta</mat-label>
+          <mat-icon matPrefix>event</mat-icon>
           <input matInput [matDatepicker]="pickerHasta" formControlName="fechaHasta" />
           <mat-datepicker-toggle matIconSuffix [for]="pickerHasta" />
           <mat-datepicker #pickerHasta />
         </mat-form-field>
 
-        <mat-form-field>
+        <mat-form-field appearance="outline">
           <mat-label>Estado</mat-label>
+          <mat-icon matPrefix>flag</mat-icon>
           <mat-select formControlName="estado">
             <mat-option [value]="null">Todos</mat-option>
             @for (estado of estados; track estado) {
@@ -56,7 +73,8 @@
 
       @if (locationSet()) {
         <div class="slider-row">
-          <span class="slider-label">Radio: {{ sliderValue() }} km</span>
+          <mat-icon class="slider-icon">radar</mat-icon>
+          <span class="slider-label">Radio: <strong>{{ sliderValue() }} km</strong></span>
           <mat-slider min="1" max="50" step="1" class="distance-slider">
             <input matSliderThumb formControlName="radioKm" />
           </mat-slider>
@@ -64,40 +82,70 @@
       }
 
       <div class="filter-actions">
-        <button mat-stroked-button type="button" (click)="useMyLocation()">
-          <mat-icon>my_location</mat-icon>
+        <button mat-stroked-button type="button" (click)="useMyLocation()" class="location-btn"
+          [class.location-active]="locationSet()">
+          <mat-icon>{{ locationSet() ? 'gps_fixed' : 'my_location' }}</mat-icon>
           {{ locationSet() ? 'Ubicación activa' : 'Usar mi ubicación' }}
         </button>
-        <button mat-stroked-button type="button" (click)="clearFilters()">Limpiar</button>
-        <button mat-raised-button color="primary" type="button" (click)="applyFilters()">
-          <mat-icon>search</mat-icon>
-          Buscar
-        </button>
+        <div class="filter-actions-right">
+          <button mat-button type="button" (click)="clearFilters()">Limpiar</button>
+          <button mat-raised-button color="primary" type="button" (click)="applyFilters()">
+            <mat-icon>search</mat-icon>
+            Buscar
+          </button>
+        </div>
       </div>
     </form>
   </mat-expansion-panel>
 
   <!-- ── Tabs: Lista / Mapa ── -->
-  <mat-tab-group animationDuration="200ms" (selectedIndexChange)="onTabChange($event)" class="content-tabs">
+  <mat-tab-group
+    animationDuration="200ms"
+    (selectedIndexChange)="onTabChange($event)"
+    class="content-tabs">
 
-    <!-- Tab Lista -->
+    <!-- ── Tab Lista ─────────────────────────────────────────────────── -->
     <mat-tab>
       <ng-template mat-tab-label>
-        <mat-icon class="tab-icon">view_list</mat-icon>
+        <mat-icon class="tab-icon">view_module</mat-icon>
         Lista
       </ng-template>
 
       @if (loading()) {
         <div class="loading-container">
-          <mat-spinner diameter="48" />
+          <mat-spinner diameter="44" />
+          <p class="loading-text">Cargando quedadas…</p>
         </div>
+
       } @else if (meetups().length === 0) {
         <div class="empty-state">
-          <mat-icon>sports</mat-icon>
-          <p>No hay quedadas con los filtros seleccionados</p>
-          <button mat-stroked-button (click)="clearFilters()">Limpiar filtros</button>
+          <div class="empty-icon-wrap">
+            <mat-icon>sports</mat-icon>
+          </div>
+          <div class="empty-text">
+            <h3>Sin resultados</h3>
+            <p>No hay quedadas con los filtros actuales.<br>¡Prueba a ajustar los filtros o crea la tuya!</p>
+          </div>
+          <div class="empty-actions">
+            <button mat-stroked-button (click)="clearFilters()">
+              <mat-icon>refresh</mat-icon>
+              Limpiar filtros
+            </button>
+            <a mat-raised-button color="primary" routerLink="/meetups/new">
+              <mat-icon>add</mat-icon>
+              Crear quedada
+            </a>
+          </div>
         </div>
+
       } @else {
+        <div class="results-header">
+          <span class="results-count">
+            <strong>{{ totalElements() }}</strong>
+            {{ totalElements() === 1 ? 'quedada encontrada' : 'quedadas encontradas' }}
+          </span>
+        </div>
+
         <div class="cards-grid">
           @for (meetup of meetups(); track meetup.id) {
             <app-meetup-card [meetup]="meetup" (cardClick)="goToDetail($event)" />
@@ -116,7 +164,7 @@
       }
     </mat-tab>
 
-    <!-- Tab Mapa -->
+    <!-- ── Tab Mapa ──────────────────────────────────────────────────── -->
     <mat-tab>
       <ng-template mat-tab-label>
         <mat-icon class="tab-icon">map</mat-icon>

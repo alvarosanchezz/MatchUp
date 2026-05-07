@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -44,7 +44,8 @@ export class MainLayoutComponent implements OnInit {
   sidenavOpen = true;
 
   ngOnInit(): void {
-    this.breakpointObserver.observe(Breakpoints.Handset).subscribe(result => {
+    // Handset de CDK usa media orientation y falla en desktop ancho — usamos px directo
+    this.breakpointObserver.observe('(max-width: 768px)').subscribe(result => {
       this.isMobile = result.matches;
       this.sidenavOpen = !result.matches;
     });
