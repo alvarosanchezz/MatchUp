@@ -133,11 +133,10 @@
         >
           @if (loading) {
             <mat-spinner diameter="22" class="btn-spinner" />
-            Creando cuenta…
           } @else {
             <mat-icon>person_add</mat-icon>
-            Crear cuenta gratis
           }
+          {{ loading ? 'Creando cuenta…' : 'Crear cuenta gratis' }}
         </button>
 
       </form>

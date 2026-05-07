@@ -101,11 +101,10 @@
         >
           @if (loading) {
             <mat-spinner diameter="22" class="btn-spinner" />
-            Iniciando sesión…
           } @else {
             <mat-icon>login</mat-icon>
-            Iniciar sesión
           }
+          {{ loading ? 'Iniciando sesión…' : 'Iniciar sesión' }}
         </button>
 
       </form>
