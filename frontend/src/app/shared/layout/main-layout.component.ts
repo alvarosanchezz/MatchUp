@@ -3,10 +3,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../../core/services/auth.service';
 
@@ -17,9 +14,9 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Quedadas', icon: 'event', route: '/meetups' },
-  { label: 'Deportes', icon: 'sports_soccer', route: '/sports' },
-  { label: 'Mi perfil', icon: 'person', route: '/profile' },
+  { label: 'Quedadas',  icon: 'event',         route: '/meetups' },
+  { label: 'Deportes',  icon: 'sports_soccer',  route: '/sports'  },
+  { label: 'Mi perfil', icon: 'person',         route: '/profile' },
 ];
 
 @Component({
@@ -29,9 +26,6 @@ const NAV_ITEMS: NavItem[] = [
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
-    MatToolbarModule,
-    MatSidenavModule,
-    MatListModule,
     MatIconModule,
     MatButtonModule,
     MatMenuModule,
@@ -56,23 +50,11 @@ export class MainLayoutComponent implements OnInit {
     });
   }
 
-  toggleSidenav(): void {
-    this.sidenavOpen = !this.sidenavOpen;
-  }
+  toggleSidenav(): void { this.sidenavOpen = !this.sidenavOpen; }
+  closeSidebar():  void { this.sidenavOpen = false; }
+  logout():        void { this.authService.logout(); }
 
-  logout(): void {
-    this.authService.logout();
-  }
-
-  get userPhoto(): string | null {
-    return this.authService.currentUser()?.urlFotoPerfil ?? null;
-  }
-
-  get userName(): string {
-    return this.authService.currentUser()?.nombre ?? '';
-  }
-
-  get userInitial(): string {
-    return this.userName.charAt(0).toUpperCase();
-  }
+  get userPhoto():   string | null { return this.authService.currentUser()?.urlFotoPerfil ?? null; }
+  get userName():    string        { return this.authService.currentUser()?.nombre ?? ''; }
+  get userInitial(): string        { return this.userName.charAt(0).toUpperCase(); }
 }

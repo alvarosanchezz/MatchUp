@@ -1,54 +1,256 @@
-.main-container {
+// ── Layout base ────────────────────────────────────────────────────────────────
+.layout {
+  display: flex;
   height: 100vh;
+  overflow: hidden;
+  background: var(--apex-bg);
 }
 
-.sidenav {
-  width: 240px;
+// ── Sidebar ────────────────────────────────────────────────────────────────────
+$sidebar-w: 240px;
+
+.sidebar {
+  flex-shrink: 0;
+  width: $sidebar-w;
+  height: 100vh;
+  background: var(--apex-surface);
+  border-right: 1px solid var(--apex-ink-10);
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 12px;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 200;
+  overflow: hidden;
 }
 
-.sidenav-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e0e0e0;
+// Mobile: sidebar es overlay
+.sidebar.sidebar-mobile {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  transform: translateX(-100%);
+  box-shadow: var(--shadow-lg);
+
+  &.sidebar-open { transform: translateX(0); }
 }
 
-.toolbar-sticky {
-  position: sticky;
-  top: 0;
-  z-index: 100;
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 199;
+  backdrop-filter: blur(2px);
+  animation: apex-fade-up 0.2s ease;
 }
 
-.user-btn {
+// Brand
+.sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 10px;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--apex-ink-10);
+  margin-bottom: 8px;
 }
 
-.avatar-img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
+.brand-icon {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--apex-blue), #4D8FD6);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon { color: white; font-size: 20px; width: 20px; height: 20px; }
 }
 
-.avatar-initials {
-  display: inline-flex;
+.brand-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--apex-ink);
+  letter-spacing: -0.4px;
+}
+
+// Nav
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 10px;
+  gap: 2px;
+}
+
+.nav-item {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.3);
-  font-weight: 600;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--apex-ink-60);
   font-size: 14px;
-  color: white;
+  font-weight: 500;
+  transition: background var(--t-fast), color var(--t-fast);
+
+  &:hover {
+    background: var(--apex-ink-05);
+    color: var(--apex-ink);
+  }
 }
 
-// Active nav item highlight
-::ng-deep .nav-active {
-  background-color: rgba(25, 118, 210, 0.1) !important;
-  color: #1976d2 !important;
+.nav-item-active {
+  background: var(--apex-blue-light) !important;
+  color: var(--apex-blue) !important;
+  font-weight: 600;
 
-  .mat-icon {
-    color: #1976d2;
-  }
+  .nav-icon { color: var(--apex-blue); }
+}
+
+.nav-icon {
+  font-size: 20px;
+  width: 20px; height: 20px;
+  flex-shrink: 0;
+  transition: color var(--t-fast);
+}
+
+.nav-label { line-height: 1; }
+
+// Spacer
+.sidebar-spacer { flex: 1; }
+
+// User section
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--t-fast);
+  border-top: 1px solid var(--apex-ink-10);
+  padding-top: 16px;
+  margin-top: 8px;
+
+  &:hover { background: var(--apex-ink-05); }
+}
+
+.user-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--apex-blue), #7B61E8);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+.user-avatar-sm {
+  width: 32px; height: 32px;
+  font-size: 12px;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--apex-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role {
+  font-size: 11px;
+  color: var(--apex-ink-40);
+}
+
+.user-chevron {
+  color: var(--apex-ink-40);
+  font-size: 18px;
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+}
+
+// Logout item
+.logout-item {
+  color: var(--apex-error) !important;
+  mat-icon { color: var(--apex-error) !important; }
+}
+
+// ── Content area ──────────────────────────────────────────────────────────────
+.content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px;
+}
+
+// ── Mobile topbar ─────────────────────────────────────────────────────────────
+.mobile-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 12px 0 8px;
+  background: var(--apex-surface);
+  border-bottom: 1px solid var(--apex-ink-10);
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.topbar-menu-btn {
+  width: 40px; height: 40px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--apex-ink-60);
+  transition: background var(--t-fast);
+
+  &:hover { background: var(--apex-ink-05); }
+  mat-icon { font-size: 22px; width: 22px; height: 22px; }
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--apex-ink);
+  letter-spacing: -0.3px;
+}
+
+.topbar-brand-icon {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, var(--apex-blue), #4D8FD6);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+
+  mat-icon { color: white; font-size: 16px; width: 16px; height: 16px; }
+}
+
+.topbar-user { cursor: pointer; }
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .page-content { padding: 16px 12px; }
 }

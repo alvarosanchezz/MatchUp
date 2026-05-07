@@ -11,7 +11,7 @@ import {
 import { QuedadaSummaryResponse } from '../models/meetup.model';
 import { Page } from '../models/page.model';
 
-export type MeetupRole = 'ORGANIZED' | 'JOINED' | 'ALL';
+export type MeetupRole = 'ORGANIZADAS' | 'APUNTADAS' | 'TODAS';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -33,7 +33,7 @@ export class UserService {
     return this.api.put<UsuarioPreferenciaResponse[], UsuarioPreferenciaRequest[]>('/users/me/sports', prefs);
   }
 
-  getMyMeetups(role: MeetupRole = 'ALL', page = 0, size = 20): Observable<Page<QuedadaSummaryResponse>> {
+  getMyMeetups(role: MeetupRole = 'TODAS', page = 0, size = 20): Observable<Page<QuedadaSummaryResponse>> {
     return this.api.get<Page<QuedadaSummaryResponse>>('/users/me/meetups', { role, page, size });
   }
 

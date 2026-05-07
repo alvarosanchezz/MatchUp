@@ -98,7 +98,7 @@ export class ProfileComponent implements OnInit {
   readonly myMeetupsPage = signal(0);
   readonly myMeetupsLoading = signal(false);
   readonly myMeetupsPageSize = 20;
-  private currentMeetupRole: MeetupRole = 'ALL';
+  private currentMeetupRole: MeetupRole = 'TODAS';
   private meetupsTabOpened = false;
 
   constructor() {
@@ -129,13 +129,13 @@ export class ProfileComponent implements OnInit {
   onOuterTabChange(index: number): void {
     if (index === 2 && !this.meetupsTabOpened) {
       this.meetupsTabOpened = true;
-      this.loadMyMeetups(0, 'ALL');
+      this.loadMyMeetups(0, 'TODAS');
     }
   }
 
   onMeetupRoleTabChange(index: number): void {
-    const roles: MeetupRole[] = ['ORGANIZED', 'JOINED', 'ALL'];
-    this.loadMyMeetups(0, roles[index] ?? 'ALL');
+    const roles: MeetupRole[] = ['ORGANIZADAS', 'APUNTADAS', 'TODAS'];
+    this.loadMyMeetups(0, roles[index] ?? 'TODAS');
   }
 
   // ── Fiabilidad ─────────────────────────────────────────────────────────

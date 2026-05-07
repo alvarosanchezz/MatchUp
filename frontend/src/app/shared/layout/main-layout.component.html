@@ -1,72 +1,106 @@
-<mat-sidenav-container class="main-container">
+<div class="layout">
 
-  <!-- ── Sidenav ──────────────────────────────────────────────────────── -->
-  <mat-sidenav
-    #sidenav
-    [mode]="isMobile ? 'over' : 'side'"
-    [(opened)]="sidenavOpen"
-    class="sidenav"
-  >
-    <div class="sidenav-header flex items-center gap-3 px-4 py-5">
-      <img src="logo.svg" alt="MatchUp" class="h-8" />
+  <!-- ── Sidebar (desktop) ──────────────────────────────────────────────── -->
+  <aside class="sidebar" [class.sidebar-open]="sidenavOpen" [class.sidebar-mobile]="isMobile">
+
+    <!-- Brand -->
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <mat-icon>sports</mat-icon>
+      </div>
+      <span class="brand-name">MatchUp</span>
     </div>
 
-    <mat-divider />
-
-    <mat-nav-list>
+    <!-- Nav -->
+    <nav class="sidebar-nav">
       @for (item of navItems; track item.route) {
         <a
-          mat-list-item
+          class="nav-item"
           [routerLink]="item.route"
-          routerLinkActive="nav-active"
-          (click)="isMobile && sidenav.close()"
+          routerLinkActive="nav-item-active"
+          (click)="isMobile && closeSidebar()"
         >
-          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-          <span matListItemTitle>{{ item.label }}</span>
+          <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+          <span class="nav-label">{{ item.label }}</span>
         </a>
       }
-    </mat-nav-list>
-  </mat-sidenav>
+    </nav>
+
+    <!-- Spacer -->
+    <div class="sidebar-spacer"></div>
+
+    <!-- User section -->
+    <div class="sidebar-user" [matMenuTriggerFor]="userMenu">
+      <div class="user-avatar">
+        @if (userPhoto) {
+          <img [src]="userPhoto" [alt]="userName" />
+        } @else {
+          <span>{{ userInitial }}</span>
+        }
+      </div>
+      <div class="user-info">
+        <span class="user-name">{{ userName }}</span>
+        <span class="user-role">Deportista</span>
+      </div>
+      <mat-icon class="user-chevron">unfold_more</mat-icon>
+    </div>
+
+    <mat-menu #userMenu="matMenu" xPosition="after" yPosition="above">
+      <a mat-menu-item routerLink="/profile">
+        <mat-icon>person_outline</mat-icon>
+        <span>Mi perfil</span>
+      </a>
+      <mat-divider />
+      <button mat-menu-item (click)="logout()" class="logout-item">
+        <mat-icon>logout</mat-icon>
+        <span>Cerrar sesión</span>
+      </button>
+    </mat-menu>
+  </aside>
+
+  <!-- Overlay (mobile) -->
+  @if (isMobile && sidenavOpen) {
+    <div class="sidebar-overlay" (click)="closeSidebar()"></div>
+  }
 
   <!-- ── Main content ─────────────────────────────────────────────────── -->
-  <mat-sidenav-content>
+  <div class="content-area">
 
-    <!-- Toolbar -->
-    <mat-toolbar color="primary" class="toolbar-sticky">
-      <button mat-icon-button (click)="toggleSidenav()" aria-label="Abrir menú">
-        <mat-icon>menu</mat-icon>
-      </button>
-
-      <span class="font-bold text-lg ml-2 flex-1">MatchUp</span>
-
-      <!-- User menu trigger -->
-      <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn">
-        @if (userPhoto) {
-          <img [src]="userPhoto" alt="foto" class="avatar-img" />
-        } @else {
-          <span class="avatar-initials">{{ userInitial }}</span>
-        }
-        <span class="ml-2 hidden sm:inline">{{ userName }}</span>
-        <mat-icon>arrow_drop_down</mat-icon>
-      </button>
-
-      <mat-menu #userMenu="matMenu">
-        <a mat-menu-item routerLink="/profile">
-          <mat-icon>person</mat-icon>
-          <span>Mi perfil</span>
-        </a>
-        <mat-divider />
-        <button mat-menu-item (click)="logout()">
-          <mat-icon>logout</mat-icon>
-          <span>Cerrar sesión</span>
+    <!-- Mobile topbar -->
+    @if (isMobile) {
+      <header class="mobile-topbar">
+        <button class="topbar-menu-btn" (click)="toggleSidenav()" aria-label="Abrir menú">
+          <mat-icon>menu</mat-icon>
         </button>
-      </mat-menu>
-    </mat-toolbar>
+        <div class="topbar-brand">
+          <div class="topbar-brand-icon"><mat-icon>sports</mat-icon></div>
+          <span>MatchUp</span>
+        </div>
+        <div class="topbar-user" [matMenuTriggerFor]="mobileUserMenu">
+          <div class="user-avatar user-avatar-sm">
+            @if (userPhoto) {
+              <img [src]="userPhoto" [alt]="userName" />
+            } @else {
+              <span>{{ userInitial }}</span>
+            }
+          </div>
+        </div>
+        <mat-menu #mobileUserMenu="matMenu">
+          <a mat-menu-item routerLink="/profile">
+            <mat-icon>person_outline</mat-icon>Mi perfil
+          </a>
+          <mat-divider />
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>Cerrar sesión
+          </button>
+        </mat-menu>
+      </header>
+    }
 
-    <!-- Page content -->
-    <main class="p-4 md:p-6">
+    <!-- Page -->
+    <main class="page-content">
       <router-outlet />
     </main>
+  </div>
 
-  </mat-sidenav-content>
-</mat-sidenav-container>
+</div>
