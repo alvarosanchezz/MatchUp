@@ -17,7 +17,7 @@ public record QuedadaPatchRequest(
         @DecimalMin(value = "-180.0") @DecimalMax(value = "180.0")
         Double ubicacionLongitud,
 
-        @Min(value = 2, message = "Se necesitan al menos 2 jugadores")
+        @Min(value = 1, message = "Se necesita al menos 1 jugador")
         Integer numJugadoresTotal,
 
         Boolean esPublica,

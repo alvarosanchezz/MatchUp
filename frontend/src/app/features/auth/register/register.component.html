@@ -116,11 +116,13 @@
             <mat-icon>{{ showConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
           @if (form.get('confirmarPassword')!.touched) {
+            <mat-error>
             @if (form.get('confirmarPassword')!.hasError('required')) {
-              <mat-error>Este campo es obligatorio</mat-error>
+              Confirmar contraseña es obligatorio
             } @else if (form.hasError('passwordMismatch')) {
-              <mat-error>Las contraseñas no coinciden</mat-error>
+              Las contraseñas no coinciden
             }
+          </mat-error>
           }
         </mat-form-field>
 

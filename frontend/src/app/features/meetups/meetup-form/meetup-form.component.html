@@ -92,13 +92,13 @@
           <!-- Número de jugadores -->
           <mat-form-field class="half-width">
             <mat-label>Número de jugadores *</mat-label>
-            <input matInput type="number" formControlName="numJugadoresTotal" min="2" />
-            <mat-hint>Mínimo 2</mat-hint>
+            <input matInput type="number" formControlName="numJugadoresTotal" min="1" />
+            <mat-hint>Mínimo 1</mat-hint>
             @if (fieldError('numJugadoresTotal', 'required')) {
               <mat-error>Requerido</mat-error>
             }
             @if (fieldError('numJugadoresTotal', 'min')) {
-              <mat-error>Mínimo 2 jugadores</mat-error>
+              <mat-error>Mínimo 1 jugador</mat-error>
             }
           </mat-form-field>
 

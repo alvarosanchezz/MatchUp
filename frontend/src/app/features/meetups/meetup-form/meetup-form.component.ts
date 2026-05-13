@@ -155,7 +155,7 @@ export class MeetupFormComponent implements OnDestroy {
       ubicacionNombre: ['', [Validators.required, Validators.maxLength(255)]],
       ubicacionLatitud: [null as number | null, Validators.required],
       ubicacionLongitud: [null as number | null, Validators.required],
-      numJugadoresTotal: [10, [Validators.required, Validators.min(2)]],
+      numJugadoresTotal: [10, [Validators.required, Validators.min(1)]],
       esPublica: [true],
       descripcion: ['', Validators.maxLength(2000)],
     },

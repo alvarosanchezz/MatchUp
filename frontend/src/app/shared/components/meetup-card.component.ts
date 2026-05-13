@@ -203,7 +203,7 @@ function sportIcon(name: string): string {
           <p class="card-title">{{ meetup.nombreDeporte }}</p>
           <span class="card-date">
             <mat-icon>schedule</mat-icon>
-            {{ meetup.fechaHoraInicio | date:'EEE d MMM · HH:mm':'':'es-ES' }}
+            {{ meetup.fechaHoraInicio | date:'dd/MM/yyyy · HH:mm' }}
           </span>
         </div>
         <span [class]="'estado-badge badge-' + meetup.estado.toLowerCase()">{{ estadoLabel }}</span>

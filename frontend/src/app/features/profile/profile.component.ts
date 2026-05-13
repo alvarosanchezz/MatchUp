@@ -129,7 +129,7 @@ export class ProfileComponent implements OnInit {
   onOuterTabChange(index: number): void {
     if (index === 2 && !this.meetupsTabOpened) {
       this.meetupsTabOpened = true;
-      this.loadMyMeetups(0, 'TODAS');
+      this.loadMyMeetups(0, 'ORGANIZADAS');
     }
   }
 

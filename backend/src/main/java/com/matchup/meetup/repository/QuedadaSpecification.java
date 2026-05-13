@@ -37,6 +37,10 @@ public class QuedadaSpecification {
             }
             if (estado != null) {
                 predicates.add(cb.equal(root.get("estado"), estado));
+            } else {
+                // Por defecto excluir quedadas canceladas y finalizadas del listado público
+                predicates.add(cb.not(root.get("estado").in(
+                        EstadoQuedada.CANCELADA, EstadoQuedada.FINALIZADA)));
             }
             if (lat != null && lon != null && radioKm != null) {
                 predicates.add(haversine(cb, root.get("ubicacionLatitud"),
