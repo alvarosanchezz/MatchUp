@@ -1,10 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatDividerModule } from '@angular/material/divider';
+import { LucideAngularModule } from 'lucide-angular';
 import { AuthService } from '../../core/services/auth.service';
 
 interface NavItem {
@@ -14,9 +11,9 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Quedadas',  icon: 'event',         route: '/meetups' },
-  { label: 'Deportes',  icon: 'sports_soccer',  route: '/sports'  },
-  { label: 'Mi perfil', icon: 'person',         route: '/profile' },
+  { label: 'Quedadas', icon: 'compass', route: '/meetups' },
+  { label: 'Deportes', icon: 'trophy',  route: '/sports'  },
+  { label: 'Perfil',   icon: 'user',    route: '/profile' },
 ];
 
 @Component({
@@ -26,10 +23,7 @@ const NAV_ITEMS: NavItem[] = [
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
-    MatIconModule,
-    MatButtonModule,
-    MatMenuModule,
-    MatDividerModule,
+    LucideAngularModule,
   ],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.scss',
@@ -40,13 +34,21 @@ export class MainLayoutComponent implements OnInit {
 
   readonly navItems = NAV_ITEMS;
 
-  isMobile = false;
+  isMobile   = false;
   sidenavOpen = true;
+  showMenu   = false;
+
+  @HostListener('document:click')
+  closeMenu(): void { this.showMenu = false; }
+
+  toggleMenu(e: Event): void {
+    e.stopPropagation();
+    this.showMenu = !this.showMenu;
+  }
 
   ngOnInit(): void {
-    // Handset de CDK usa media orientation y falla en desktop ancho — usamos px directo
-    this.breakpointObserver.observe('(max-width: 768px)').subscribe(result => {
-      this.isMobile = result.matches;
+    this.breakpointObserver.observe('(max-width: 900px)').subscribe(result => {
+      this.isMobile   = result.matches;
       this.sidenavOpen = !result.matches;
     });
   }
@@ -55,7 +57,15 @@ export class MainLayoutComponent implements OnInit {
   closeSidebar():  void { this.sidenavOpen = false; }
   logout():        void { this.authService.logout(); }
 
-  get userPhoto():   string | null { return this.authService.currentUser()?.urlFotoPerfil ?? null; }
-  get userName():    string        { return this.authService.currentUser()?.nombre ?? ''; }
-  get userInitial(): string        { return this.userName.charAt(0).toUpperCase(); }
+  get userPhoto():    string | null { return this.authService.currentUser()?.urlFotoPerfil ?? null; }
+  get userName():     string        { return this.authService.currentUser()?.nombre ?? ''; }
+  get userInitial():  string        { return this.userName.charAt(0).toUpperCase(); }
+  get userInitials(): string {
+    return this.userName
+      .split(' ')
+      .slice(0, 2)
+      .map(s => s[0] ?? '')
+      .join('')
+      .toUpperCase() || '?';
+  }
 }

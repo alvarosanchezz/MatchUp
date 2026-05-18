@@ -1,6 +1,9 @@
 spring:
   jpa:
     show-sql: false
+    hibernate:
+      # Flyway gestiona el esquema; Hibernate no valida (evita problemas con PG18+)
+      ddl-auto: none
 
 # ── Logs mínimos en producción ──
 logging:

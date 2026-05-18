@@ -1,256 +1,506 @@
-// ── Layout base ────────────────────────────────────────────────────────────────
-.layout {
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-  background: var(--apex-bg);
+// ── App shell ─────────────────────────────────────────────────────────────────
+:host { display: contents; }
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 248px 1fr;
+  min-height: 100vh;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 }
 
-// ── Sidebar ────────────────────────────────────────────────────────────────────
-$sidebar-w: 240px;
-
+// ── Sidebar ───────────────────────────────────────────────────────────────────
 .sidebar {
-  flex-shrink: 0;
-  width: $sidebar-w;
-  height: 100vh;
-  background: var(--apex-surface);
-  border-right: 1px solid var(--apex-ink-10);
+  border-right: 1px solid var(--hairline);
+  background: var(--bg);
+  padding: 20px 16px;
   display: flex;
   flex-direction: column;
-  padding: 0 0 12px;
-  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 200;
-  overflow: hidden;
+  gap: 4px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  // No overflow-y here — allows the user-dropdown to escape the container.
+  // The inner .sidebar-scroll handles nav scrolling instead.
+  overflow: visible;
+
+  @media (max-width: 900px) {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+    width: 248px;
+    transform: translateX(-100%);
+    transition: transform 280ms cubic-bezier(0.2, 0.9, 0.3, 1);
+    box-shadow: 6px 0 32px color-mix(in oklab, black 40%, transparent);
+
+    &.sidebar--visible { transform: translateX(0); }
+  }
+
+  @media (min-width: 901px) {
+    transform: none !important;
+  }
 }
 
-// Mobile: sidebar es overlay
-.sidebar.sidebar-mobile {
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  transform: translateX(-100%);
-  box-shadow: var(--shadow-lg);
-
-  &.sidebar-open { transform: translateX(0); }
+// Scrollable nav area (keeps the user-pill outside so the dropdown isn't clipped)
+.sidebar-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  // Negative margin trick to let the scrollbar sit flush against the sidebar edge
+  margin-right: -4px;
+  padding-right: 4px;
 }
 
 .sidebar-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.35);
-  z-index: 199;
-  backdrop-filter: blur(2px);
-  animation: apex-fade-up 0.2s ease;
+  display: none;
+
+  @media (max-width: 900px) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: color-mix(in oklab, black 55%, transparent);
+    z-index: 99;
+    backdrop-filter: blur(2px);
+  }
 }
 
 // Brand
-.sidebar-brand {
+.brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 20px 20px 16px;
-  border-bottom: 1px solid var(--apex-ink-10);
-  margin-bottom: 8px;
+  padding: 6px 8px 18px;
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: 10px;
+  flex-shrink: 0;
 }
 
-.brand-icon {
-  width: 34px; height: 34px;
-  background: linear-gradient(135deg, var(--apex-blue), #4D8FD6);
-  border-radius: var(--radius-sm);
-  display: flex; align-items: center; justify-content: center;
+.brand-logo {
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
-
-  mat-icon { color: white; font-size: 20px; width: 20px; height: 20px; }
+  // Drop shadow to lift the logo off the sidebar background
+  filter: drop-shadow(0 2px 6px color-mix(in oklab, var(--accent) 35%, transparent));
 }
 
 .brand-name {
-  font-size: 17px;
-  font-weight: 800;
-  color: var(--apex-ink);
-  letter-spacing: -0.4px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+
+  b { color: var(--accent); font-weight: 700; }
 }
 
-// Nav
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  padding: 4px 10px;
-  gap: 2px;
-}
+// Nav items
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  color: var(--ink-2);
   text-decoration: none;
-  color: var(--apex-ink-60);
-  font-size: 14px;
   font-weight: 500;
-  transition: background var(--t-fast), color var(--t-fast);
+  font-size: 14px;
+  cursor: pointer;
+  position: relative;
+  transition: background 120ms ease, color 120ms ease;
+
+  lucide-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  .badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.4;
+  }
 
   &:hover {
-    background: var(--apex-ink-05);
-    color: var(--apex-ink);
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  &.active {
+    background: var(--surface);
+    color: var(--ink);
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 22px;
+      background: var(--accent);
+      border-radius: 0 3px 3px 0;
+    }
   }
 }
 
-.nav-item-active {
-  background: var(--apex-blue-light) !important;
-  color: var(--apex-blue) !important;
-  font-weight: 600;
+// .sidebar-spacer no longer needed — .sidebar-scroll uses flex:1 instead
 
-  .nav-icon { color: var(--apex-blue); }
-}
-
-.nav-icon {
-  font-size: 20px;
-  width: 20px; height: 20px;
-  flex-shrink: 0;
-  transition: color var(--t-fast);
-}
-
-.nav-label { line-height: 1; }
-
-// Spacer
-.sidebar-spacer { flex: 1; }
-
-// User section
-.sidebar-user {
+// User pill
+.user-pill {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 10px;
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
   cursor: pointer;
-  transition: background var(--t-fast);
-  border-top: 1px solid var(--apex-ink-10);
-  padding-top: 16px;
-  margin-top: 8px;
-
-  &:hover { background: var(--apex-ink-05); }
-}
-
-.user-avatar {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--apex-blue), #7B61E8);
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden;
+  transition: background 120ms;
   flex-shrink: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: white;
 
-  img { width: 100%; height: 100%; object-fit: cover; }
+  &:hover { background: var(--surface-2); }
+
+  > lucide-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--ink-faint);
+    flex-shrink: 0;
+  }
 }
 
-.user-avatar-sm {
-  width: 32px; height: 32px;
-  font-size: 12px;
+.avatar {
+  width: 34px; height: 34px;
+  border-radius: 999px;
+  background: var(--accent-dim);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  font-size: 13px;
+  flex-shrink: 0;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
-.user-info {
+.user-pill-info {
   flex: 1;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
 }
 
-.user-name {
-  font-size: 13px;
+.user-pill-name {
   font-weight: 600;
-  color: var(--apex-ink);
+  font-size: 13px;
+  color: var(--ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.user-role {
+.user-pill-meta {
   font-size: 11px;
-  color: var(--apex-ink-40);
+  color: var(--ink-faint);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 1px;
+
+  lucide-icon { width: 11px; height: 11px; }
+}
+
+// ── User pill wrapper + dropdown ──────────────────────────────────────────────
+.user-pill-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+// Make pill full-width and button-reset when used as <button>
+.user-pill {
+  width: 100%;
+  font-family: inherit;
 }
 
 .user-chevron {
-  color: var(--apex-ink-40);
-  font-size: 18px;
-  width: 18px; height: 18px;
+  width: 16px;
+  height: 16px;
+  color: var(--ink-faint);
   flex-shrink: 0;
+  transition: transform 200ms ease;
+
+  &.rotated { transform: rotate(180deg); }
 }
 
-// Logout item
-.logout-item {
-  color: var(--apex-error) !important;
-  mat-icon { color: var(--apex-error) !important; }
+.user-dropdown {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  padding: 6px;
+  z-index: 200;
+  box-shadow: 0 8px 32px color-mix(in oklab, black 35%, transparent);
 }
 
-// ── Content area ──────────────────────────────────────────────────────────────
-.content-area {
+.drop-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+  transition: background 120ms;
+
+  lucide-icon { width: 16px; height: 16px; }
+
+  &:hover { background: var(--bg-2); }
+}
+
+.drop-item-danger { color: var(--danger); }
+
+.drop-divider {
+  height: 1px;
+  background: var(--hairline);
+  margin: 4px 2px;
+}
+
+// ── Main column ───────────────────────────────────────────────────────────────
+.main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Topbar ────────────────────────────────────────────────────────────────────
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 28px;
+  background: color-mix(in oklab, var(--bg) 85%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--hairline);
+  flex-shrink: 0;
+
+  @media (max-width: 900px) {
+    padding: 12px 16px;
+  }
+}
+
+.mobile-menu-btn {
+  display: none;
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  lucide-icon { width: 20px; height: 20px; }
+
+  @media (max-width: 900px) { display: inline-flex; }
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  color: var(--ink-muted);
+  max-width: 480px;
+  flex: 1;
+
+  lucide-icon { width: 15px; height: 15px; color: var(--ink-muted); flex-shrink: 0; }
+
+  input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--ink);
+    font-size: 14px;
+    font-family: inherit;
+    min-width: 0;
+
+    &::placeholder { color: var(--ink-faint); }
+  }
+
+  kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 5px;
+    background: var(--bg-2);
+    border: 1px solid var(--hairline);
+    color: var(--ink-faint);
+    white-space: nowrap;
+
+    @media (max-width: 600px) { display: none; }
+  }
+}
+
+.topbar-spacer { flex: 1; }
+
+.icon-btn {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 120ms, border-color 120ms;
+  position: relative;
+  flex-shrink: 0;
+
+  &:hover { background: var(--surface-2); border-color: var(--hairline-2); }
+
+  lucide-icon { width: 18px; height: 18px; }
+
+  .dot {
+    position: absolute;
+    top: 8px; right: 9px;
+    width: 7px; height: 7px;
+    border-radius: 999px;
+    background: var(--accent);
+    border: 2px solid var(--surface);
+  }
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: transform 120ms, filter 120ms;
+  font-family: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &:hover { filter: brightness(1.06); transform: translateY(-1px); }
+  &:active { transform: translateY(0); }
+
+  lucide-icon { width: 16px; height: 16px; }
+
+  @media (max-width: 600px) {
+    span { display: none; }
+    padding: 9px 10px;
+  }
+}
+
+// ── Page area ─────────────────────────────────────────────────────────────────
+.page-area {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  min-width: 0;
+
+  // Padding conservador para que los componentes actuales no queden pegados al borde.
+  // Se eliminará progresivamente en las fases 2-7 cuando cada componente use .page.
+  > * { padding: 24px 28px; }
+
+  @media (max-width: 900px) {
+    > * { padding: 20px 16px 100px; }
+  }
 }
 
-.page-content {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 24px;
-}
-
-// ── Mobile topbar ─────────────────────────────────────────────────────────────
-.mobile-topbar {
-  display: flex;
+// ── Bottom nav (mobile) ───────────────────────────────────────────────────────
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 12px;
+  left: 12px; right: 12px;
+  z-index: 30;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 18px;
+  padding: 8px;
+  justify-content: space-around;
   align-items: center;
-  justify-content: space-between;
-  height: 56px;
-  padding: 0 12px 0 8px;
-  background: var(--apex-surface);
-  border-bottom: 1px solid var(--apex-ink-10);
-  flex-shrink: 0;
-  gap: 8px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  list-style: none;
+  margin: 0;
+
+  @media (max-width: 900px) { display: flex; }
 }
 
-.topbar-menu-btn {
-  width: 40px; height: 40px;
-  border: none;
-  background: transparent;
-  border-radius: var(--radius-md);
-  display: flex; align-items: center; justify-content: center;
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  border-radius: 12px;
+  color: var(--ink-muted);
   cursor: pointer;
-  color: var(--apex-ink-60);
-  transition: background var(--t-fast);
+  font-size: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  background: none;
+  border: none;
+  font-family: inherit;
+  transition: color 120ms, background 120ms;
 
-  &:hover { background: var(--apex-ink-05); }
-  mat-icon { font-size: 22px; width: 22px; height: 22px; }
-}
+  lucide-icon { width: 18px; height: 18px; }
 
-.topbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--apex-ink);
-  letter-spacing: -0.3px;
-}
+  &.active {
+    color: var(--ink);
+    background: var(--bg-2);
 
-.topbar-brand-icon {
-  width: 28px; height: 28px;
-  background: linear-gradient(135deg, var(--apex-blue), #4D8FD6);
-  border-radius: var(--radius-sm);
-  display: flex; align-items: center; justify-content: center;
+    lucide-icon { color: var(--accent); }
+  }
 
-  mat-icon { color: white; font-size: 16px; width: 16px; height: 16px; }
-}
+  &.fab {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-radius: 999px;
+    width: 52px; height: 52px;
+    flex: 0 0 52px;
+    justify-content: center;
+    margin-top: -22px;
+    box-shadow: 0 4px 16px color-mix(in oklab, var(--accent) 45%, transparent);
 
-.topbar-user { cursor: pointer; }
-
-// ── Responsive ────────────────────────────────────────────────────────────────
-@media (max-width: 768px) {
-  .page-content { padding: 16px 12px; }
+    lucide-icon { width: 22px; height: 22px; color: var(--accent-ink); }
+  }
 }

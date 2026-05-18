@@ -9,18 +9,12 @@ import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DatePipe, DecimalPipe } from '@angular/common';
+import { LucideAngularModule } from 'lucide-angular';
 
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
@@ -46,63 +40,60 @@ const NIVEL_LABELS = ['', 'Principiante', 'Amateur', 'Intermedio', 'Avanzado', '
     ReactiveFormsModule,
     DatePipe,
     DecimalPipe,
-    MatTabsModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
+    RouterLink,
+    LucideAngularModule,
     MatFormFieldModule,
     MatInputModule,
-    MatProgressBarModule,
-    MatProgressSpinnerModule,
     MatSnackBarModule,
     MatDialogModule,
-    MatDividerModule,
     MatPaginatorModule,
     MatTooltipModule,
-    RouterLink,
     MeetupCardComponent,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
 export class ProfileComponent implements OnInit {
-  private readonly authSvc = inject(AuthService);
-  private readonly userSvc = inject(UserService);
+  private readonly authSvc  = inject(AuthService);
+  private readonly userSvc  = inject(UserService);
   private readonly sportSvc = inject(SportService);
-  private readonly router = inject(Router);
+  private readonly router   = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
-  private readonly dialog = inject(MatDialog);
-  private readonly fb = inject(FormBuilder);
+  private readonly dialog   = inject(MatDialog);
+  private readonly fb       = inject(FormBuilder);
 
-  // ── Exposed signal ─────────────────────────────────────────────────────
+  // ── Exposed ────────────────────────────────────────────────────────────
   readonly currentUser = this.authSvc.currentUser;
+
+  // ── Tab state ──────────────────────────────────────────────────────────
+  readonly activeTab       = signal(0);
+  readonly activeMeetupTab = signal(0);
 
   // ── Profile form ───────────────────────────────────────────────────────
   readonly profileForm = this.fb.group({
-    nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+    nombre:        ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
     urlFotoPerfil: ['', Validators.maxLength(500)],
   });
   readonly savingProfile = signal(false);
-  readonly locationSet = signal(false);
+  readonly locationSet   = signal(false);
   private _lat: number | null = null;
   private _lon: number | null = null;
 
   // ── Sports ─────────────────────────────────────────────────────────────
-  readonly sports = signal<UsuarioPreferenciaResponse[]>([]);
-  readonly allSports = signal<DeporteResponse[]>([]);
+  readonly sports      = signal<UsuarioPreferenciaResponse[]>([]);
+  readonly allSports   = signal<DeporteResponse[]>([]);
   readonly savingSports = signal(false);
 
   // ── Meetups ────────────────────────────────────────────────────────────
-  readonly myMeetups = signal<QuedadaSummaryResponse[]>([]);
-  readonly myMeetupsTotal = signal(0);
-  readonly myMeetupsPage = signal(0);
+  readonly myMeetups        = signal<QuedadaSummaryResponse[]>([]);
+  readonly myMeetupsTotal   = signal(0);
+  readonly myMeetupsPage    = signal(0);
   readonly myMeetupsLoading = signal(false);
   readonly myMeetupsPageSize = 20;
   private currentMeetupRole: MeetupRole = 'TODAS';
   private meetupsTabOpened = false;
 
   constructor() {
-    // Keep local sports in sync with currentUser signal
     effect(() => {
       const user = this.authSvc.currentUser();
       if (user) this.sports.set(user.deportes);
@@ -112,10 +103,7 @@ export class ProfileComponent implements OnInit {
   ngOnInit(): void {
     const user = this.authSvc.currentUser();
     if (user) {
-      this.profileForm.patchValue({
-        nombre: user.nombre,
-        urlFotoPerfil: user.urlFotoPerfil ?? '',
-      });
+      this.profileForm.patchValue({ nombre: user.nombre, urlFotoPerfil: user.urlFotoPerfil ?? '' });
       if (user.ubicacionLatitud != null) {
         this._lat = user.ubicacionLatitud;
         this._lon = user.ubicacionLongitud;
@@ -126,6 +114,16 @@ export class ProfileComponent implements OnInit {
   }
 
   // ── Tab navigation ─────────────────────────────────────────────────────
+  setActiveTab(index: number): void {
+    this.activeTab.set(index);
+    this.onOuterTabChange(index);
+  }
+
+  setMeetupRoleTab(index: number): void {
+    this.activeMeetupTab.set(index);
+    this.onMeetupRoleTabChange(index);
+  }
+
   onOuterTabChange(index: number): void {
     if (index === 2 && !this.meetupsTabOpened) {
       this.meetupsTabOpened = true;
@@ -167,11 +165,7 @@ export class ProfileComponent implements OnInit {
     );
   }
 
-  clearLocation(): void {
-    this._lat = null;
-    this._lon = null;
-    this.locationSet.set(false);
-  }
+  clearLocation(): void { this._lat = null; this._lon = null; this.locationSet.set(false); }
 
   coordsDisplay(): string {
     if (this._lat == null || this._lon == null) return '';
@@ -180,55 +174,38 @@ export class ProfileComponent implements OnInit {
 
   // ── Profile save ───────────────────────────────────────────────────────
   saveProfile(): void {
-    if (this.profileForm.invalid) {
-      this.profileForm.markAllAsTouched();
-      return;
-    }
+    if (this.profileForm.invalid) { this.profileForm.markAllAsTouched(); return; }
     this.savingProfile.set(true);
     const v = this.profileForm.value;
-    this.userSvc
-      .updateMe({
-        nombre: v.nombre ?? undefined,
-        urlFotoPerfil: v.urlFotoPerfil || undefined,
-        ubicacionLatitud: this._lat ?? undefined,
-        ubicacionLongitud: this._lon ?? undefined,
-      })
-      .subscribe({
-        next: () => {
-          this.authSvc.loadCurrentUser().subscribe();
-          this.snackBar.open('Perfil actualizado ✓', 'Cerrar', { duration: 2500 });
-          this.savingProfile.set(false);
-        },
-        error: (err: HttpErrorResponse) => {
-          const pd = err.error as ProblemDetail;
-          this.snackBar.open(pd?.detail ?? 'Error al guardar', 'Cerrar', { duration: 4000 });
-          this.savingProfile.set(false);
-        },
-      });
+    this.userSvc.updateMe({
+      nombre: v.nombre ?? undefined,
+      urlFotoPerfil: v.urlFotoPerfil || undefined,
+      ubicacionLatitud: this._lat ?? undefined,
+      ubicacionLongitud: this._lon ?? undefined,
+    }).subscribe({
+      next: () => {
+        this.authSvc.loadCurrentUser().subscribe();
+        this.snackBar.open('Perfil actualizado ✓', 'Cerrar', { duration: 2500 });
+        this.savingProfile.set(false);
+      },
+      error: (err: HttpErrorResponse) => {
+        const pd = err.error as ProblemDetail;
+        this.snackBar.open(pd?.detail ?? 'Error al guardar', 'Cerrar', { duration: 4000 });
+        this.savingProfile.set(false);
+      },
+    });
   }
 
   // ── Sports ─────────────────────────────────────────────────────────────
   openAddSportDialog(): void {
-    const ref = this.dialog.open<
+    const ref = this.dialog.open<AddSportDialogComponent, AddSportDialogData, UsuarioPreferenciaRequest>(
       AddSportDialogComponent,
-      AddSportDialogData,
-      UsuarioPreferenciaRequest
-    >(AddSportDialogComponent, {
-      data: {
-        allSports: this.allSports(),
-        existingIds: this.sports().map(s => s.idDeporte),
-      },
-      width: '420px',
-    });
-
+      { data: { allSports: this.allSports(), existingIds: this.sports().map(s => s.idDeporte) }, width: '420px' }
+    );
     ref.afterClosed().subscribe(result => {
       if (!result) return;
       const requests: UsuarioPreferenciaRequest[] = [
-        ...this.sports().map(s => ({
-          idDeporte: s.idDeporte,
-          nivel: s.nivel,
-          rolPreferido: s.rolPreferido || undefined,
-        })),
+        ...this.sports().map(s => ({ idDeporte: s.idDeporte, nivel: s.nivel, rolPreferido: s.rolPreferido || undefined })),
         result,
       ];
       this.saveSports(requests);
@@ -236,8 +213,7 @@ export class ProfileComponent implements OnInit {
   }
 
   removeSport(idDeporte: number): void {
-    const requests: UsuarioPreferenciaRequest[] = this.sports()
-      .filter(s => s.idDeporte !== idDeporte)
+    const requests = this.sports().filter(s => s.idDeporte !== idDeporte)
       .map(s => ({ idDeporte: s.idDeporte, nivel: s.nivel, rolPreferido: s.rolPreferido || undefined }));
     this.saveSports(requests);
   }
@@ -281,7 +257,5 @@ export class ProfileComponent implements OnInit {
     this.loadMyMeetups(e.pageIndex, this.currentMeetupRole);
   }
 
-  goToMeetup(id: number): void {
-    this.router.navigate(['/meetups', id]);
-  }
+  goToMeetup(id: number): void { this.router.navigate(['/meetups', id]); }
 }

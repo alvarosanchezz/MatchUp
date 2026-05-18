@@ -1,304 +1,205 @@
 @use '@angular/material' as mat;
+@use './styles/tokens';
 
-// ── Tailwind (preflight OFF) ──────────────────────────────────────────────────
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-// ── Angular Material M3 — tema Apex ──────────────────────────────────────────
+// ── Angular Material M3 — Dark theme ──────────────────────────────────────────
 @include mat.core();
 
-$apex-theme: mat.define-theme((
+$matchup-theme: mat.define-theme((
   color: (
-    theme-type: light,
-    primary:   mat.$azure-palette,
-    tertiary:  mat.$orange-palette,
+    theme-type: dark,
+    primary:    mat.$violet-palette,
+    tertiary:   mat.$cyan-palette,
   ),
   typography: (
-    brand-family: "'Inter', system-ui, -apple-system, sans-serif",
-    plain-family: "'Inter', system-ui, -apple-system, sans-serif",
+    brand-family: "'Space Grotesk', 'Inter', system-ui, sans-serif",
+    plain-family: "'Inter', system-ui, sans-serif",
   ),
   density: (scale: 0),
 ));
 
 html {
   height: 100%;
-  @include mat.all-component-themes($apex-theme);
+  @include mat.all-component-themes($matchup-theme);
 }
 
-// ── Apex Design Tokens ────────────────────────────────────────────────────────
+// ── Reset ──────────────────────────────────────────────────────────────────────
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ── Tokens globales (sombras, radios, timing) ──────────────────────────────────
 :root {
-  // Marca: azul eléctrico (acción primaria)
-  --apex-blue:         #0066CC;
-  --apex-blue-dark:    #004EA3;
-  --apex-blue-light:   #E8F1FF;
-  --apex-blue-glow:    rgba(0, 102, 204, 0.20);
+  --shadow-sm:    0 1px 3px color-mix(in oklch, black 15%, transparent),
+                  0 1px 2px color-mix(in oklch, black 10%, transparent);
+  --shadow-md:    0 4px 12px color-mix(in oklch, black 18%, transparent),
+                  0 2px 4px color-mix(in oklch, black 10%, transparent);
+  --shadow-lg:    0 10px 28px color-mix(in oklch, black 22%, transparent),
+                  0 4px 8px color-mix(in oklch, black 12%, transparent);
+  --shadow-hover: 0 16px 40px color-mix(in oklch, black 28%, transparent),
+                  0 6px 12px color-mix(in oklch, black 14%, transparent);
 
-  // Energía: naranja deportivo
-  --apex-energy:       #FF6B2B;
-  --apex-energy-dark:  #E85A1A;
-  --apex-energy-light: #FFF0E8;
-
-  // Neutrales (escala Apple)
-  --apex-ink:          #0A0A0F;
-  --apex-ink-80:       #1C1C1E;
-  --apex-ink-60:       #48484A;
-  --apex-ink-40:       #8E8E93;
-  --apex-ink-20:       #C7C7CC;
-  --apex-ink-10:       #E5E5EA;
-  --apex-ink-05:       #F5F5F7;
-
-  // Superficies
-  --apex-bg:           #F2F2F7;
-  --apex-surface:      #FFFFFF;
-  --apex-surface-2:    #F9F9FB;
-
-  // Semánticos
-  --apex-success:      #28CD41;
-  --apex-success-bg:   #E6FAE9;
-  --apex-warning:      #FF9500;
-  --apex-warning-bg:   #FFF4E0;
-  --apex-error:        #FF3B30;
-  --apex-error-bg:     #FFE8E7;
-  --apex-neutral:      #636366;
-  --apex-neutral-bg:   #F2F2F7;
-
-  // Sombras
-  --shadow-sm:    0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-md:    0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
-  --shadow-lg:    0 10px 28px rgba(0,0,0,0.10), 0 4px 8px rgba(0,0,0,0.06);
-  --shadow-hover: 0 16px 40px rgba(0,0,0,0.12), 0 6px 12px rgba(0,0,0,0.07);
-  --shadow-blue:  0 4px 16px rgba(0,102,204,0.28);
-
-  // Radios
   --radius-sm:   6px;
   --radius-md:   10px;
   --radius-lg:   14px;
   --radius-xl:   20px;
   --radius-full: 999px;
 
-  // Timing
   --t-fast:   120ms ease;
   --t-normal: 200ms ease;
   --t-slow:   320ms ease;
-
-  // Retrocompat con variables antiguas (por si algún componente las usa)
-  --mu-primary:       var(--apex-blue);
-  --mu-primary-light: #4D8FD6;
-  --mu-accent:        var(--apex-energy);
-  --mu-accent-light:  #FF9469;
-  --mu-bg:            var(--apex-bg);
-  --mu-surface:       var(--apex-surface);
-  --mu-text:          var(--apex-ink);
-  --mu-text-muted:    var(--apex-ink-40);
-}
-
-// ── Reset y base ──────────────────────────────────────────────────────────────
-*, *::before, *::after { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  height: 100%;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 15px;
-  line-height: 1.6;
-  background-color: var(--apex-bg);
-  color: var(--apex-ink);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-// Inter sobre Roboto
-.mat-typography, .mat-mdc-card, .mat-mdc-button,
-.mdc-button, .mdc-list-item, .mat-mdc-form-field {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
 }
 
 // ── Tipografía ────────────────────────────────────────────────────────────────
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
   font-weight: 700;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.03em;
   line-height: 1.2;
-  color: var(--apex-ink);
+  color: var(--ink);
   margin: 0;
 }
 
-// ── Angular Material overrides ────────────────────────────────────────────────
-
-// Cards
-.mat-mdc-card {
-  border-radius: var(--radius-lg) !important;
-  box-shadow: var(--shadow-sm) !important;
-  border: 1px solid var(--apex-ink-10) !important;
-  background: var(--apex-surface) !important;
-  transition: box-shadow var(--t-normal), transform var(--t-normal) !important;
-  overflow: hidden;
-}
-.mat-mdc-card-header  { padding: 16px 20px 0 !important; }
-.mat-mdc-card-content { padding: 12px 20px !important; }
-.mat-mdc-card-actions {
-  padding: 8px 12px 12px !important;
-  border-top: 1px solid var(--apex-ink-10);
-  margin-top: 4px;
-}
-.mat-mdc-card-title {
-  font-size: 16px !important;
-  font-weight: 700 !important;
-  color: var(--apex-ink) !important;
-  letter-spacing: -0.2px !important;
-  font-family: 'Inter', system-ui, sans-serif !important;
-}
-.mat-mdc-card-subtitle {
-  font-size: 13px !important;
-  color: var(--apex-ink-40) !important;
-  margin-top: 2px !important;
-  font-family: 'Inter', system-ui, sans-serif !important;
-}
-
-// Buttons
-.mat-mdc-raised-button, .mat-mdc-unelevated-button {
-  border-radius: var(--radius-md) !important;
-  font-weight: 600 !important;
-  letter-spacing: 0 !important;
-  font-family: 'Inter', system-ui, sans-serif !important;
-  height: 42px !important;
-  transition: all var(--t-normal) !important;
-
-  &.mat-primary {
-    box-shadow: var(--shadow-blue) !important;
-    &:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,102,204,0.36) !important; }
-    &:active { transform: scale(0.98) !important; }
-  }
-}
-.mat-mdc-outlined-button {
-  border-radius: var(--radius-md) !important;
-  font-weight: 600 !important;
-  letter-spacing: 0 !important;
-  font-family: 'Inter', system-ui, sans-serif !important;
-  border-color: var(--apex-ink-20) !important;
-  height: 42px !important;
-  transition: all var(--t-normal) !important;
-  &:hover { background: var(--apex-bg) !important; border-color: var(--apex-ink-40) !important; }
-}
-.mat-mdc-button {
-  border-radius: var(--radius-md) !important;
-  font-weight: 600 !important;
-  letter-spacing: 0 !important;
-  font-family: 'Inter', system-ui, sans-serif !important;
-}
-.mat-mdc-icon-button {
-  border-radius: var(--radius-sm) !important;
-  transition: background var(--t-fast) !important;
-  &:hover { background: var(--apex-ink-05) !important; }
-}
+// ── Material overrides (dark tokens) ─────────────────────────────────────────
 
 // Form fields
-.mat-mdc-form-field .mdc-floating-label,
-.mat-mdc-form-field input,
-.mat-mdc-form-field textarea {
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-outline-color:         var(--hairline);
+  --mdc-outlined-text-field-hover-outline-color:   var(--hairline-2);
+  --mdc-outlined-text-field-focus-outline-color:   var(--accent);
+  --mdc-outlined-text-field-input-text-color:      var(--ink);
+  --mdc-outlined-text-field-label-text-color:      var(--ink-muted);
+  --mdc-outlined-text-field-focus-label-text-color: var(--accent);
+  --mdc-outlined-text-field-caret-color:           var(--accent);
+  --mdc-outlined-text-field-container-shape:       var(--radius-md);
   font-family: 'Inter', system-ui, sans-serif !important;
 }
 .mdc-notched-outline__leading  { border-radius: var(--radius-md) 0 0 var(--radius-md) !important; }
 .mdc-notched-outline__trailing { border-radius: 0 var(--radius-md) var(--radius-md) 0 !important; }
 
-// Dialogs
+// Select + autocomplete
+.mat-mdc-select-panel,
+.mat-mdc-autocomplete-panel {
+  background: var(--surface) !important;
+  border: 1px solid var(--hairline) !important;
+  border-radius: var(--radius-md) !important;
+}
+.mat-mdc-option {
+  color: var(--ink) !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  &:hover:not([disabled]) { background: var(--bg-2) !important; }
+  &.mdc-list-item--selected:not(:hover) {
+    background: color-mix(in oklch, var(--accent) 12%, transparent) !important;
+  }
+}
+
+// Dialog
 .mdc-dialog__surface {
+  background: var(--surface) !important;
   border-radius: var(--radius-xl) !important;
+  border: 1px solid var(--hairline) !important;
   box-shadow: var(--shadow-lg) !important;
 }
 .mat-mdc-dialog-title {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  color: var(--ink) !important;
+  font-family: 'Space Grotesk', sans-serif !important;
   font-weight: 700 !important;
-  letter-spacing: -0.3px !important;
+  letter-spacing: -0.02em !important;
 }
+.mat-mdc-dialog-content { color: var(--ink) !important; }
 
 // Snackbar
 .mat-mdc-snack-bar-container { border-radius: var(--radius-lg) !important; }
 .mat-mdc-snackbar-surface {
-  background: var(--apex-ink-80) !important;
+  background: var(--surface-2) !important;
+  border: 1px solid var(--hairline) !important;
   border-radius: var(--radius-lg) !important;
 }
-
-// Tabs
-.mat-mdc-tab {
-  font-family: 'Inter', system-ui, sans-serif !important;
-  font-weight: 600 !important;
-  letter-spacing: 0 !important;
-}
-
-// Button toggles
-.mat-button-toggle-group {
-  border-radius: var(--radius-md) !important;
-  border-color: var(--apex-ink-10) !important;
-}
-.mat-button-toggle { font-family: 'Inter', system-ui, sans-serif !important; font-size: 13px !important; }
-
-// Dividers
-.mat-divider { border-color: var(--apex-ink-10) !important; }
-
-// Nav list
-.mat-mdc-nav-list .mat-mdc-list-item {
-  border-radius: var(--radius-md) !important;
-  margin: 2px 8px !important;
-  font-family: 'Inter', system-ui, sans-serif !important;
-  transition: background var(--t-fast) !important;
-}
-
-// Menus
-.mat-mdc-menu-panel {
-  border-radius: var(--radius-lg) !important;
-  box-shadow: var(--shadow-lg) !important;
-  border: 1px solid var(--apex-ink-10) !important;
-  min-width: 180px !important;
-  overflow: hidden;
-}
-.mat-mdc-menu-item {
-  font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  margin: 2px 6px !important;
-  border-radius: var(--radius-sm) !important;
-  &:hover { background: var(--apex-bg) !important; }
-}
-
-// Expansion panels
-.mat-expansion-panel {
-  border-radius: var(--radius-lg) !important;
-  box-shadow: var(--shadow-sm) !important;
-  border: 1px solid var(--apex-ink-10) !important;
-  background: var(--apex-surface) !important;
-
-  .mat-expansion-panel-header {
-    font-family: 'Inter', system-ui, sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 14px !important;
-    border-radius: var(--radius-lg) !important;
-  }
-  &.mat-expanded .mat-expansion-panel-header {
-    border-bottom: 1px solid var(--apex-ink-10);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
-  }
-}
+.mat-mdc-snack-bar-label { color: var(--ink) !important; }
+.mat-mdc-snack-bar-action { color: var(--accent) !important; }
 
 // Paginator
 .mat-mdc-paginator {
   background: transparent !important;
+  color: var(--ink-muted) !important;
   font-family: 'Inter', system-ui, sans-serif !important;
+  border-top: 1px solid var(--hairline);
+  margin-top: 8px;
 }
 
 // Tooltip
 .mat-mdc-tooltip {
-  font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 12px !important;
+  --mdc-plain-tooltip-container-color: var(--surface-2);
+  --mdc-plain-tooltip-supporting-text-color: var(--ink);
+  border: 1px solid var(--hairline) !important;
   border-radius: var(--radius-sm) !important;
+  font-size: 12px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
 }
 
-// ── Scroll refinado ───────────────────────────────────────────────────────────
-::-webkit-scrollbar { width: 6px; height: 6px; }
+// Datepicker
+.mat-datepicker-content {
+  background: var(--surface) !important;
+  border: 1px solid var(--hairline) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.mat-calendar-body-selected {
+  background: var(--accent) !important;
+  color: var(--accent-ink) !important;
+}
+
+// Slide toggle
+.mat-mdc-slide-toggle {
+  --mdc-switch-selected-track-color:     var(--accent);
+  --mdc-switch-selected-handle-color:    var(--accent-ink);
+  --mdc-switch-selected-icon-color:      var(--accent-ink);
+}
+
+// ── Lucide icon normalization ─────────────────────────────────────────────────
+// LucideAngular sets width/height as SVG *attributes* (e.g. width="24").
+// Those attributes are not affected by CSS on the host <lucide-icon> element.
+// Fix: make lucide-icon an inline-flex container and force the inner SVG to
+// fill 100% of it, so component CSS (e.g. `lucide-icon { width:16px }`) and
+// [size]="N" both work correctly everywhere.
+lucide-icon {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  vertical-align: middle;
+  line-height: 0;
+}
+lucide-icon svg {
+  display: block;
+  width:  100% !important;
+  height: 100% !important;
+}
+
+// ── Scrollbar ─────────────────────────────────────────────────────────────────
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--apex-ink-20); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--apex-ink-40); }
+::-webkit-scrollbar-thumb {
+  background: var(--hairline);
+  border-radius: 8px;
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--hairline-2); }
+
+// ── Focus ─────────────────────────────────────────────────────────────────────
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
 
 // ── Animaciones ───────────────────────────────────────────────────────────────
 @keyframes apex-fade-up {
@@ -312,29 +213,3 @@ h1, h2, h3, h4, h5, h6 {
   to   { opacity: 1; transform: scale(1); }
 }
 .apex-scale-in { animation: apex-scale-in 0.2s ease both; }
-
-// ── Focus accesible ───────────────────────────────────────────────────────────
-*:focus-visible {
-  outline: 2px solid var(--apex-blue);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
-}
-
-// ── Badges de estado ──────────────────────────────────────────────────────────
-.apex-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-
-  &.badge-abierta    { background: var(--apex-success-bg); color: #1a7a2e; }
-  &.badge-completa   { background: var(--apex-warning-bg); color: #8a5000; }
-  &.badge-finalizada { background: var(--apex-neutral-bg); color: var(--apex-neutral); }
-  &.badge-cancelada  { background: var(--apex-error-bg);   color: #bf1e15; }
-}

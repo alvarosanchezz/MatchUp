@@ -1,4 +1,3 @@
-import { Component, inject } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -7,20 +6,18 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
+import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { LucideAngularModule } from 'lucide-angular';
 import { AuthService } from '../../../core/services/auth.service';
 import { ProblemDetail } from '../../../core/models/problem-detail.model';
 
 const passwordMatch: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
-  const pw = group.get('password')?.value;
+  const pw      = group.get('password')?.value;
   const confirm = group.get('confirmarPassword')?.value;
   return pw && confirm && pw !== confirm ? { passwordMismatch: true } : null;
 };
@@ -31,49 +28,41 @@ const passwordMatch: ValidatorFn = (group: AbstractControl): ValidationErrors | 
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
+    LucideAngularModule,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
 export class RegisterComponent {
-  private readonly fb = inject(FormBuilder);
+  private readonly fb          = inject(FormBuilder);
   private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly router      = inject(Router);
+  private readonly snackBar    = inject(MatSnackBar);
 
-  loading = false;
+  loading      = false;
   showPassword = false;
-  showConfirm = false;
+  showConfirm  = false;
 
   form = this.fb.group(
     {
-      nombre: ['', [Validators.required, Validators.maxLength(100)]],
-      email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
-      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(100)]],
+      nombre:            ['', [Validators.required, Validators.maxLength(100)]],
+      email:             ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
+      password:          ['', [Validators.required, Validators.minLength(8), Validators.maxLength(100)]],
       confirmarPassword: ['', Validators.required],
     },
     { validators: passwordMatch }
   );
 
   submit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.loading = true;
     const { nombre, email, password } = this.form.getRawValue();
-
     this.authService.register({ nombre: nombre!, email: email!, password: password! }).subscribe({
       next: () => {
         this.authService.loadCurrentUser().subscribe({
-          next: () => this.router.navigate(['/meetups']),
+          next:  () => this.router.navigate(['/meetups']),
           error: () => this.router.navigate(['/meetups']),
         });
       },

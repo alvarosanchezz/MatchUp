@@ -1,16 +1,14 @@
 <div class="profile-page">
 
-  <!-- ── Athlete hero ───────────────────────────────────────────────────────── -->
+  <!-- ── Hero ─────────────────────────────────────────────────────────────── -->
   @if (currentUser(); as user) {
     <div class="athlete-hero">
-      <div class="hero-orb hero-orb-1"></div>
-      <div class="hero-orb hero-orb-2"></div>
+      <div class="hero-orb-1"></div>
+      <div class="hero-orb-2"></div>
 
       <div class="hero-inner">
-
-        <!-- Left: avatar + identity -->
         <div class="hero-left">
-          <div class="avatar-ring" [class]="scoreClass()">
+          <div class="avatar-ring" [class]="'avatar-ring ' + scoreClass()">
             <div class="athlete-avatar">
               @if (user.urlFotoPerfil) {
                 <img [src]="user.urlFotoPerfil" [alt]="user.nombre" />
@@ -30,12 +28,12 @@
 
             <div class="athlete-pills">
               <span class="meta-pill">
-                <mat-icon>calendar_today</mat-icon>
+                <lucide-icon name="calendar"></lucide-icon>
                 Desde {{ user.fechaRegistro | date:'MMM yyyy':'':'es-ES' }}
               </span>
               @if (sports().length > 0) {
                 <span class="meta-pill">
-                  <mat-icon>sports</mat-icon>
+                  <lucide-icon name="trophy"></lucide-icon>
                   {{ sports().length }} {{ sports().length === 1 ? 'deporte' : 'deportes' }}
                 </span>
               }
@@ -43,53 +41,56 @@
           </div>
         </div>
 
-        <!-- Right: fiabilidad score -->
         <div class="hero-score">
-          <div class="score-badge" [class]="scoreClass()">
+          <div class="score-badge" [class]="'score-badge ' + scoreClass()">
             <span class="score-big">{{ user.fiabilidadScore | number:'1.0-0' }}</span>
             <span class="score-pct">%</span>
           </div>
           <p class="score-label">Fiabilidad</p>
           <div class="score-track">
-            <div class="score-fill" [class]="scoreClass()" [style.width.%]="user.fiabilidadScore"></div>
+            <div class="score-fill" [class]="'score-fill ' + scoreClass()" [style.width.%]="user.fiabilidadScore"></div>
           </div>
         </div>
-
       </div>
     </div>
   }
 
-  <!-- ── Tabs ───────────────────────────────────────────────────────────────── -->
-  <mat-tab-group
-    animationDuration="200ms"
-    (selectedIndexChange)="onOuterTabChange($event)"
-    class="profile-tabs">
-
-    <!-- ══ Tab 1: Datos personales ══ -->
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon class="tab-icon">person</mat-icon>
+  <!-- ── CSS Tabs ───────────────────────────────────────────────────────── -->
+  <div class="tabs-wrap">
+    <div class="tabs-nav">
+      <button class="tab-btn" [class.tab-btn-active]="activeTab() === 0" (click)="setActiveTab(0)">
+        <lucide-icon name="user"></lucide-icon>
         Datos
-      </ng-template>
+      </button>
+      <button class="tab-btn" [class.tab-btn-active]="activeTab() === 1" (click)="setActiveTab(1)">
+        <lucide-icon name="trophy"></lucide-icon>
+        Deportes
+      </button>
+      <button class="tab-btn" [class.tab-btn-active]="activeTab() === 2" (click)="setActiveTab(2)">
+        <lucide-icon name="calendar"></lucide-icon>
+        Mis quedadas
+      </button>
+    </div>
 
+    <!-- ══ Tab 0: Datos ══ -->
+    @if (activeTab() === 0) {
       <div class="tab-pane">
-        <div class="settings-card">
+        <div class="settings-panel">
 
-          <div class="settings-card-header">
-            <div class="settings-card-icon">
-              <mat-icon>person_outline</mat-icon>
+          <div class="panel-header">
+            <div class="panel-icon">
+              <lucide-icon name="user"></lucide-icon>
             </div>
             <div>
-              <h2 class="settings-card-title">Información personal</h2>
-              <p class="settings-card-sub">Actualiza tu nombre y foto de perfil</p>
+              <h2 class="panel-title">Información personal</h2>
+              <p class="panel-sub">Actualiza tu nombre y foto de perfil</p>
             </div>
           </div>
 
           <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
 
-            <mat-form-field appearance="outline" class="full-width">
+            <mat-form-field appearance="outline" class="full-field">
               <mat-label>Nombre</mat-label>
-              <mat-icon matPrefix>badge</mat-icon>
               <input matInput formControlName="nombre" />
               @if (profileForm.get('nombre')?.hasError('required') && profileForm.get('nombre')?.touched) {
                 <mat-error>El nombre es obligatorio</mat-error>
@@ -99,50 +100,46 @@
               }
             </mat-form-field>
 
-            <mat-form-field appearance="outline" class="full-width">
+            <mat-form-field appearance="outline" class="full-field">
               <mat-label>URL foto de perfil</mat-label>
-              <mat-icon matPrefix>image</mat-icon>
               <input matInput formControlName="urlFotoPerfil" placeholder="https://…" />
               <mat-hint>Enlace directo a tu foto</mat-hint>
             </mat-form-field>
 
-            <div class="location-card">
-              <div class="location-card-header">
-                <mat-icon>place</mat-icon>
-                <div class="location-card-text">
+            <!-- Location -->
+            <div class="location-box">
+              <div class="location-header">
+                <lucide-icon name="map-pin" class="location-pin-icon"></lucide-icon>
+                <div class="location-text">
                   <p class="location-title">Mi ubicación</p>
                   <p class="location-sub">Usada para filtrar quedadas cercanas</p>
                 </div>
                 @if (locationSet()) {
-                  <span class="location-active-badge">Activa</span>
+                  <span class="location-badge">Activa</span>
                 }
               </div>
               <div class="location-actions">
-                <button mat-stroked-button type="button" (click)="useMyLocation()"
-                  [class.location-btn-active]="locationSet()">
-                  <mat-icon>{{ locationSet() ? 'gps_fixed' : 'my_location' }}</mat-icon>
+                <button type="button" class="btn-ghost" (click)="useMyLocation()">
+                  <lucide-icon [name]="locationSet() ? 'navigation' : 'map-pin'"></lucide-icon>
                   {{ locationSet() ? 'Actualizar' : 'Usar mi ubicación' }}
                 </button>
                 @if (locationSet()) {
-                  <button mat-icon-button type="button" matTooltip="Quitar ubicación" (click)="clearLocation()">
-                    <mat-icon>close</mat-icon>
+                  <button type="button" class="icon-btn" matTooltip="Quitar ubicación" (click)="clearLocation()">
+                    <lucide-icon name="x"></lucide-icon>
                   </button>
                 }
               </div>
               @if (locationSet()) {
-                <p class="coords-chip">
-                  <mat-icon>gps_fixed</mat-icon>
-                  {{ coordsDisplay() }}
-                </p>
+                <p class="coords-display">{{ coordsDisplay() }}</p>
               }
             </div>
 
-            <div class="form-actions">
-              <button mat-raised-button color="primary" type="submit" [disabled]="savingProfile()" class="save-btn">
+            <div class="form-actions-row">
+              <button type="submit" class="btn-primary" [disabled]="savingProfile()">
                 @if (savingProfile()) {
-                  <mat-spinner diameter="18" class="btn-spinner" />
+                  <span class="btn-spinner"></span>
                 } @else {
-                  <mat-icon>check</mat-icon>
+                  <lucide-icon name="check"></lucide-icon>
                 }
                 Guardar cambios
               </button>
@@ -151,73 +148,62 @@
           </form>
         </div>
       </div>
-    </mat-tab>
+    }
 
-    <!-- ══ Tab 2: Mis deportes ══ -->
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon class="tab-icon">sports</mat-icon>
-        Deportes
-      </ng-template>
-
+    <!-- ══ Tab 1: Deportes ══ -->
+    @if (activeTab() === 1) {
       <div class="tab-pane">
-        <div class="settings-card">
+        <div class="settings-panel">
 
-          <div class="settings-card-header">
-            <div class="settings-card-icon energy-icon">
-              <mat-icon>sports</mat-icon>
+          <div class="panel-header">
+            <div class="panel-icon panel-icon-accent">
+              <lucide-icon name="trophy"></lucide-icon>
             </div>
-            <div class="settings-card-title-group">
-              <h2 class="settings-card-title">Mis deportes</h2>
-              <p class="settings-card-sub">Deportes que practicas y tu nivel</p>
+            <div class="panel-header-text">
+              <h2 class="panel-title">Mis deportes</h2>
+              <p class="panel-sub">Deportes que practicas y tu nivel</p>
             </div>
-            <button mat-raised-button color="primary"
-              (click)="openAddSportDialog()"
-              [disabled]="savingSports()"
-              class="add-sport-btn">
-              <mat-icon>add</mat-icon>
+            <button class="btn-primary btn-sm" (click)="openAddSportDialog()" [disabled]="savingSports()">
+              <lucide-icon name="plus"></lucide-icon>
               Añadir
             </button>
           </div>
 
           @if (savingSports()) {
             <div class="loading-row">
-              <mat-spinner diameter="36" />
+              <span class="spinner"></span>
             </div>
           } @else if (sports().length === 0) {
             <div class="empty-state">
-              <div class="empty-icon-wrap">
-                <mat-icon>sports</mat-icon>
-              </div>
+              <div class="empty-icon"><lucide-icon name="trophy"></lucide-icon></div>
               <div class="empty-text">
                 <h3>Sin deportes</h3>
-                <p>Añade los deportes que practicas<br>para que otros te encuentren</p>
+                <p>Añade los deportes que practicas para que otros te encuentren</p>
               </div>
-              <button mat-raised-button color="primary" (click)="openAddSportDialog()">
-                <mat-icon>add</mat-icon>
+              <button class="btn-primary" (click)="openAddSportDialog()">
+                <lucide-icon name="plus"></lucide-icon>
                 Añadir deporte
               </button>
             </div>
           } @else {
-            <div class="sports-list-rows">
+            <div class="sports-list">
               @for (sport of sports(); track sport.idDeporte) {
                 <div class="sport-row">
-                  <div class="sport-row-icon">
-                    <mat-icon>sports</mat-icon>
+                  <div class="sport-icon-wrap">
+                    <lucide-icon name="trophy"></lucide-icon>
                   </div>
-                  <div class="sport-row-body">
-                    <span class="sport-row-name">{{ sport.nombreDeporte }}</span>
-                    <div class="sport-row-meta">
+                  <div class="sport-body">
+                    <span class="sport-name">{{ sport.nombreDeporte }}</span>
+                    <div class="sport-meta">
                       <span class="sport-stars">{{ nivelStars(sport.nivel) }}</span>
-                      <span class="sport-level-badge">{{ nivelLabel(sport.nivel) }}</span>
+                      <span class="sport-level">{{ nivelLabel(sport.nivel) }}</span>
                       @if (sport.rolPreferido) {
                         <span class="sport-role">{{ sport.rolPreferido }}</span>
                       }
                     </div>
                   </div>
-                  <button mat-icon-button matTooltip="Eliminar" class="sport-delete-btn"
-                    (click)="removeSport(sport.idDeporte)">
-                    <mat-icon>delete_outline</mat-icon>
+                  <button class="icon-btn icon-btn-danger" matTooltip="Eliminar" (click)="removeSport(sport.idDeporte)">
+                    <lucide-icon name="trash-2"></lucide-icon>
                   </button>
                 </div>
               }
@@ -226,40 +212,38 @@
 
         </div>
       </div>
-    </mat-tab>
+    }
 
-    <!-- ══ Tab 3: Mis quedadas ══ -->
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon class="tab-icon">event</mat-icon>
-        Mis quedadas
-      </ng-template>
-
+    <!-- ══ Tab 2: Mis quedadas ══ -->
+    @if (activeTab() === 2) {
       <div class="tab-pane">
-        <mat-tab-group
-          animationDuration="150ms"
-          (selectedIndexChange)="onMeetupRoleTabChange($event)"
-          class="inner-tabs">
-          <mat-tab label="Organizadas" />
-          <mat-tab label="Apuntadas" />
-          <mat-tab label="Todas" />
-        </mat-tab-group>
+
+        <!-- Inner role tabs -->
+        <div class="inner-tabs-nav">
+          <button class="inner-tab" [class.inner-tab-active]="activeMeetupTab() === 0" (click)="setMeetupRoleTab(0)">
+            Organizadas
+          </button>
+          <button class="inner-tab" [class.inner-tab-active]="activeMeetupTab() === 1" (click)="setMeetupRoleTab(1)">
+            Apuntadas
+          </button>
+          <button class="inner-tab" [class.inner-tab-active]="activeMeetupTab() === 2" (click)="setMeetupRoleTab(2)">
+            Todas
+          </button>
+        </div>
 
         @if (myMeetupsLoading()) {
           <div class="loading-row">
-            <mat-spinner diameter="40" />
+            <span class="spinner"></span>
           </div>
         } @else if (myMeetups().length === 0) {
           <div class="empty-state">
-            <div class="empty-icon-wrap">
-              <mat-icon>event_busy</mat-icon>
-            </div>
+            <div class="empty-icon"><lucide-icon name="calendar"></lucide-icon></div>
             <div class="empty-text">
               <h3>Sin quedadas</h3>
               <p>No tienes quedadas en esta categoría</p>
             </div>
-            <a mat-stroked-button routerLink="/meetups">
-              <mat-icon>search</mat-icon>
+            <a routerLink="/meetups" class="btn-ghost">
+              <lucide-icon name="compass"></lucide-icon>
               Explorar quedadas
             </a>
           </div>
@@ -278,8 +262,9 @@
             hidePageSize
             showFirstLastButtons />
         }
-      </div>
-    </mat-tab>
 
-  </mat-tab-group>
+      </div>
+    }
+
+  </div>
 </div>

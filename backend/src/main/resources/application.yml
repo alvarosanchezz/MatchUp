@@ -5,18 +5,19 @@ spring:
     active: dev   # sobreescribir con -Dspring.profiles.active=prod en producción
 
   # ── DataSource ──────────────────────────────────────────────────────────────
-  # DB_URL acepta la URL JDBC completa (incluido ?sslmode=require para Neon/prod)
-  # Docker-compose la construye con host interno; Railway usa la URL de Neon
+  # Acepta SPRING_DATASOURCE_URL (env var nativa de Spring Boot) o DB_URL como alias.
+  # Neon: jdbc:postgresql://ep-xxx.eu-west-2.aws.neon.tech/neondb?sslmode=require
+  # Docker-compose: jdbc:postgresql://db:5432/matchup_db  (sin SSL)
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/matchup_db}
-    username: ${DB_USER:matchup_user}
-    password: ${DB_PASS:matchup_pass}
+    url: ${SPRING_DATASOURCE_URL:${DB_URL:jdbc:postgresql://localhost:5432/matchup_db}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USER:matchup_user}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASS:matchup_pass}}
     driver-class-name: org.postgresql.Driver
     hikari:
       pool-name: MatchUpPool
-      maximum-pool-size: 10
-      minimum-idle: 2
-      connection-timeout: 20000
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 30000
       idle-timeout: 300000
 
   # ── JPA ──

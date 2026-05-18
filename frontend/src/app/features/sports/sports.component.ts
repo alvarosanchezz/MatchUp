@@ -1,16 +1,12 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { LucideAngularModule } from 'lucide-angular';
 
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { AuthService } from '../../core/services/auth.service';
@@ -22,35 +18,47 @@ import {
   ConfirmDialogData,
 } from '../../shared/components/confirm-dialog.component';
 
+function sportIcon(name: string): string {
+  const n = name.toLowerCase();
+  if (n.includes('fútbol') || n.includes('futbol') || n.includes('soccer')) return 'activity';
+  if (n.includes('basket') || n.includes('baloncesto'))  return 'activity';
+  if (n.includes('tenis') || n.includes('tennis'))       return 'zap';
+  if (n.includes('volei') || n.includes('voley'))        return 'volleyball';
+  if (n.includes('natac') || n.includes('swim'))         return 'waves';
+  if (n.includes('ciclismo') || n.includes('bici'))      return 'bike';
+  if (n.includes('running') || n.includes('atletismo'))  return 'footprints';
+  if (n.includes('padel') || n.includes('pádel'))        return 'zap';
+  if (n.includes('golf'))                                return 'flag';
+  return 'trophy';
+}
+
 @Component({
   selector: 'app-sports',
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
+    LucideAngularModule,
     MatFormFieldModule,
     MatInputModule,
-    MatProgressSpinnerModule,
     MatSnackBarModule,
     MatDialogModule,
-    MatDividerModule,
     MatTooltipModule,
   ],
   styles: [`
     :host { display: block; }
+
     .sports-page {
       max-width: 800px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
       gap: 20px;
-      animation: apex-fade-up 0.3s ease both;
     }
-    /* Page hero */
+
+    /* ── Page hero ──────────────────────────────────────────────────────── */
     .page-hero {
-      background: linear-gradient(135deg, #0f0c29 0%, #1e1b4b 50%, #0a1628 100%);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: var(--radius-xl);
       padding: 28px 32px;
       display: flex;
@@ -64,39 +72,92 @@ import {
     .page-hero::before {
       content: '';
       position: absolute;
-      top: -50px; right: -50px;
-      width: 200px; height: 200px;
+      top: -60px; right: -60px;
+      width: 220px; height: 220px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,102,204,0.2) 0%, transparent 70%);
+      background: radial-gradient(circle, color-mix(in oklch, var(--accent) 20%, transparent) 0%, transparent 65%);
       pointer-events: none;
     }
     .hero-text { position: relative; z-index: 1; }
     .page-title {
+      font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(1.5rem, 3vw, 2rem);
       font-weight: 800;
-      color: white;
+      color: var(--ink);
       margin: 0 0 4px;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.03em;
     }
     .page-subtitle {
       font-size: 13px;
-      color: rgba(255,255,255,0.5);
+      color: color-mix(in oklch, var(--ink) 50%, transparent);
       margin: 0;
     }
-    .new-btn {
+
+    /* ── Buttons ────────────────────────────────────────────────────────── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: filter 120ms, transform 120ms;
       flex-shrink: 0;
-      background: white !important;
-      color: var(--apex-ink) !important;
-      font-weight: 700 !important;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.25) !important;
       position: relative; z-index: 1;
+      lucide-icon { width: 16px; height: 16px; }
+      &:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
     }
-    /* Content card */
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      color: color-mix(in oklch, var(--ink) 70%, transparent);
+      border: 1px solid var(--hairline);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 9px 16px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 120ms, color 120ms;
+      lucide-icon { width: 16px; height: 16px; }
+      &:hover:not(:disabled) { background: var(--surface); color: var(--ink); }
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
+    }
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px; height: 34px;
+      border-radius: var(--radius-md);
+      background: none;
+      border: 1px solid var(--hairline);
+      color: color-mix(in oklch, var(--ink) 60%, transparent);
+      cursor: pointer;
+      transition: background 120ms, color 120ms;
+      lucide-icon { width: 15px; height: 15px; }
+      &:hover:not(:disabled) { background: var(--surface); color: var(--ink); }
+      &:disabled { opacity: 0.4; cursor: not-allowed; }
+      &.icon-btn-danger {
+        color: var(--danger);
+        border-color: color-mix(in oklch, var(--danger) 25%, transparent);
+        &:hover:not(:disabled) { background: color-mix(in oklch, var(--danger) 10%, transparent); }
+      }
+    }
+
+    /* ── Content card ───────────────────────────────────────────────────── */
     .content-card {
-      background: var(--apex-surface);
+      background: var(--surface);
       border-radius: var(--radius-lg);
-      border: 1px solid var(--apex-ink-10);
-      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--hairline);
       overflow: hidden;
     }
     .loading-container {
@@ -104,7 +165,17 @@ import {
       justify-content: center;
       padding: 64px 0;
     }
-    /* Empty state */
+    .spinner {
+      display: block;
+      width: 40px; height: 40px;
+      border: 3px solid var(--hairline);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Empty state ────────────────────────────────────────────────────── */
     .empty-state {
       display: flex;
       flex-direction: column;
@@ -113,80 +184,72 @@ import {
       padding: 64px 16px;
       text-align: center;
     }
-    .empty-icon-wrap {
-      width: 72px; height: 72px;
+    .empty-icon {
+      width: 64px; height: 64px;
       border-radius: var(--radius-xl);
-      background: linear-gradient(135deg, var(--apex-blue-light), #E0EDFF);
+      background: color-mix(in oklch, var(--accent) 12%, transparent);
       display: flex; align-items: center; justify-content: center;
-    }
-    .empty-icon-wrap mat-icon {
-      font-size: 36px; width: 36px; height: 36px;
-      color: var(--apex-blue);
+      lucide-icon { width: 32px; height: 32px; color: var(--accent); }
     }
     .empty-state p {
       font-size: 14px;
-      color: var(--apex-ink-40);
+      color: color-mix(in oklch, var(--ink) 45%, transparent);
       margin: 0;
     }
-    /* Sports list */
+
+    /* ── Sports list ────────────────────────────────────────────────────── */
     .sports-list { display: flex; flex-direction: column; }
     .sport-row {
       display: flex;
       align-items: center;
       padding: 14px 24px;
       gap: 14px;
-      border-bottom: 1px solid var(--apex-ink-10);
-      transition: background 0.15s;
+      border-bottom: 1px solid var(--hairline);
+      transition: background var(--t-fast);
+      &:last-child { border-bottom: none; }
+      &:hover { background: var(--bg); }
     }
-    .sport-row:last-child { border-bottom: none; }
-    .sport-row:hover { background: var(--apex-bg); }
     .sport-row-icon {
-      width: 38px; height: 38px;
+      width: 40px; height: 40px;
       border-radius: var(--radius-md);
-      background: #FFF3E0;
+      background: color-mix(in oklch, var(--accent) 14%, transparent);
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
-    }
-    .sport-row-icon mat-icon {
-      color: #E65100; font-size: 18px; width: 18px; height: 18px;
+      lucide-icon { width: 20px; height: 20px; color: var(--accent); }
     }
     .sport-info { flex: 1; min-width: 0; }
     .sport-name {
       font-size: 15px;
       font-weight: 600;
-      color: var(--apex-ink);
+      color: var(--ink);
       margin: 0 0 3px;
     }
     .sport-meta {
       font-size: 12px;
-      color: var(--apex-ink-40);
+      color: color-mix(in oklch, var(--ink) 50%, transparent);
       margin: 0 0 2px;
-      display: flex; align-items: center; gap: 4px;
+      display: flex; align-items: center; gap: 5px;
+      lucide-icon { width: 13px; height: 13px; }
     }
     .sport-desc {
       font-size: 12px;
-      color: var(--apex-ink-40);
+      color: color-mix(in oklch, var(--ink) 45%, transparent);
       margin: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       max-width: 400px;
     }
-    .sport-actions {
-      display: flex;
-      gap: 4px;
-      flex-shrink: 0;
-    }
-    /* Inline add/edit form */
+    .sport-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+    /* ── Inline add/edit form ───────────────────────────────────────────── */
     .edit-form {
       padding: 16px 24px;
-      background: var(--apex-blue-light);
-      border-bottom: 1px solid var(--apex-ink-10);
+      background: color-mix(in oklch, var(--accent) 5%, transparent);
+      border-bottom: 1px solid var(--hairline);
     }
     .edit-form-title {
       font-size: 14px;
       font-weight: 700;
-      color: var(--apex-ink);
+      color: var(--ink);
       margin: 0 0 12px;
     }
     .form-row {
@@ -195,21 +258,22 @@ import {
       gap: 12px;
       align-items: flex-start;
     }
-    .field-name { flex: 2 1 200px; }
+    .field-name    { flex: 2 1 200px; }
     .field-players { flex: 1 1 120px; }
-    .field-desc { width: 100%; }
+    .field-desc    { width: 100%; }
     .form-actions {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
-      margin-top: 4px;
+      margin-top: 8px;
     }
+
     @media (max-width: 600px) {
       .sports-page { gap: 14px; }
-      .page-hero { padding: 20px 20px; border-radius: var(--radius-lg); }
+      .page-hero { padding: 20px; border-radius: var(--radius-lg); }
       .sport-row { padding: 12px 16px; }
       .sport-desc { max-width: 200px; }
-      .new-btn { width: 100%; justify-content: center; }
+      .btn-primary { width: 100%; justify-content: center; }
     }
   `],
   template: `
@@ -222,8 +286,8 @@ import {
           <p class="page-subtitle">Catálogo de deportes disponibles en la plataforma</p>
         </div>
         @if (isAdmin()) {
-          <button mat-raised-button class="new-btn" (click)="openAddForm()">
-            <mat-icon>add</mat-icon>
+          <button class="btn-primary" (click)="openAddForm()">
+            <lucide-icon name="plus"></lucide-icon>
             Añadir deporte
           </button>
         }
@@ -253,11 +317,8 @@ import {
                 </mat-form-field>
               </div>
               <div class="form-actions">
-                <button mat-button type="button" (click)="cancelForm()" [disabled]="saving()">Cancelar</button>
-                <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
-                  @if (saving()) { <mat-spinner diameter="18" style="display:inline-block;margin-right:6px;vertical-align:middle" /> }
-                  Guardar
-                </button>
+                <button class="btn-ghost" type="button" (click)="cancelForm()" [disabled]="saving()">Cancelar</button>
+                <button class="btn-primary" type="submit" [disabled]="saving()">Guardar</button>
               </div>
             </form>
           </div>
@@ -268,14 +329,14 @@ import {
       @if (loading()) {
         <div class="content-card">
           <div class="loading-container">
-            <mat-spinner diameter="44" />
+            <span class="spinner"></span>
           </div>
         </div>
       } @else if (sports().length === 0) {
         <div class="content-card">
           <div class="empty-state">
-            <div class="empty-icon-wrap">
-              <mat-icon>sports</mat-icon>
+            <div class="empty-icon">
+              <lucide-icon name="trophy"></lucide-icon>
             </div>
             <p>No hay deportes registrados todavía</p>
           </div>
@@ -306,23 +367,20 @@ import {
                       </mat-form-field>
                     </div>
                     <div class="form-actions">
-                      <button mat-button type="button" (click)="cancelForm()" [disabled]="saving()">Cancelar</button>
-                      <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
-                        @if (saving()) { <mat-spinner diameter="18" style="display:inline-block;margin-right:6px;vertical-align:middle" /> }
-                        Guardar
-                      </button>
+                      <button class="btn-ghost" type="button" (click)="cancelForm()" [disabled]="saving()">Cancelar</button>
+                      <button class="btn-primary" type="submit" [disabled]="saving()">Guardar</button>
                     </div>
                   </form>
                 </div>
               } @else {
                 <div class="sport-row">
                   <div class="sport-row-icon">
-                    <mat-icon>sports</mat-icon>
+                    <lucide-icon [name]="getSportIcon(sport.nombre)"></lucide-icon>
                   </div>
                   <div class="sport-info">
                     <p class="sport-name">{{ sport.nombre }}</p>
                     <p class="sport-meta">
-                      <mat-icon style="font-size:13px;width:13px;height:13px">group</mat-icon>
+                      <lucide-icon name="users" [size]="13"></lucide-icon>
                       {{ sport.jugadoresDefault }} jugadores por defecto
                     </p>
                     @if (sport.descripcion) {
@@ -331,13 +389,13 @@ import {
                   </div>
                   @if (isAdmin()) {
                     <div class="sport-actions">
-                      <button mat-icon-button matTooltip="Editar"
+                      <button class="icon-btn" matTooltip="Editar"
                         (click)="openEditForm(sport)" [disabled]="saving()">
-                        <mat-icon>edit</mat-icon>
+                        <lucide-icon name="pencil"></lucide-icon>
                       </button>
-                      <button mat-icon-button color="warn" matTooltip="Eliminar"
+                      <button class="icon-btn icon-btn-danger" matTooltip="Eliminar"
                         (click)="deleteSport(sport)" [disabled]="saving()">
-                        <mat-icon>delete_outline</mat-icon>
+                        <lucide-icon name="trash-2"></lucide-icon>
                       </button>
                     </div>
                   }
@@ -351,29 +409,29 @@ import {
   `,
 })
 export class SportsComponent implements OnInit {
-  private readonly authSvc = inject(AuthService);
+  private readonly authSvc  = inject(AuthService);
   private readonly sportSvc = inject(SportService);
   private readonly snackBar = inject(MatSnackBar);
-  private readonly dialog = inject(MatDialog);
-  private readonly fb = inject(FormBuilder);
+  private readonly dialog   = inject(MatDialog);
+  private readonly fb       = inject(FormBuilder);
 
-  readonly loading = signal(false);
-  readonly saving = signal(false);
-  readonly sports = signal<DeporteResponse[]>([]);
+  readonly loading     = signal(false);
+  readonly saving      = signal(false);
+  readonly sports      = signal<DeporteResponse[]>([]);
   readonly showAddForm = signal(false);
-  readonly editingId = signal<number | null>(null);
+  readonly editingId   = signal<number | null>(null);
 
   readonly isAdmin = computed(() => this.authSvc.currentUser()?.rol === 'ADMIN');
 
   readonly sportForm = this.fb.group({
-    nombre: ['', [Validators.required, Validators.maxLength(100)]],
-    jugadoresDefault: [2, [Validators.required, Validators.min(1), Validators.max(100)]],
-    descripcion: [''],
+    nombre:           ['', [Validators.required, Validators.maxLength(100)]],
+    jugadoresDefault: [2,  [Validators.required, Validators.min(1), Validators.max(100)]],
+    descripcion:      [''],
   });
 
-  ngOnInit(): void {
-    this.loadSports();
-  }
+  getSportIcon(name: string): string { return sportIcon(name); }
+
+  ngOnInit(): void { this.loadSports(); }
 
   private loadSports(): void {
     this.loading.set(true);
@@ -383,7 +441,6 @@ export class SportsComponent implements OnInit {
     });
   }
 
-  // ── Form controls ─────────────────────────────────────────────────────────
   openAddForm(): void {
     this.editingId.set(null);
     this.sportForm.reset({ nombre: '', jugadoresDefault: 2, descripcion: '' });
@@ -406,7 +463,6 @@ export class SportsComponent implements OnInit {
     this.sportForm.reset();
   }
 
-  // ── Submit add ────────────────────────────────────────────────────────────
   submitAdd(): void {
     if (this.sportForm.invalid) { this.sportForm.markAllAsTouched(); return; }
     this.saving.set(true);
@@ -432,7 +488,6 @@ export class SportsComponent implements OnInit {
     });
   }
 
-  // ── Submit edit ───────────────────────────────────────────────────────────
   submitEdit(id: number): void {
     if (this.sportForm.invalid) { this.sportForm.markAllAsTouched(); return; }
     this.saving.set(true);
@@ -457,7 +512,6 @@ export class SportsComponent implements OnInit {
     });
   }
 
-  // ── Delete ────────────────────────────────────────────────────────────────
   deleteSport(sport: DeporteResponse): void {
     const ref = this.dialog.open<ConfirmDialogComponent, ConfirmDialogData, boolean>(
       ConfirmDialogComponent,

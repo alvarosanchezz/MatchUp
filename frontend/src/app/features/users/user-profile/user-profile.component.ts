@@ -2,14 +2,6 @@ import { Component, Input, OnChanges, inject, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
 
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatChipsModule } from '@angular/material/chips';
-
 import { UserService } from '../../../core/services/user.service';
 import { UsuarioPublicResponse } from '../../../core/models/user.model';
 
@@ -18,75 +10,86 @@ const NIVEL_LABELS = ['', 'Principiante', 'Amateur', 'Intermedio', 'Avanzado', '
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [
-    DatePipe,
-    DecimalPipe,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressBarModule,
-    MatProgressSpinnerModule,
-    MatDividerModule,
-    MatChipsModule,
-  ],
+  imports: [DatePipe, DecimalPipe],
   styles: [`
     .profile-page {
       padding: 24px;
       max-width: 680px;
       margin: 0 auto;
-    }
-    .loading-container {
       display: flex;
-      justify-content: center;
-      padding: 64px 0;
+      flex-direction: column;
+      gap: 16px;
+      animation: apex-fade-up 0.3s ease both;
     }
+
+    /* Back */
+    .back-btn {
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink-muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 6px 4px;
+      border-radius: var(--radius-sm);
+      transition: color 120ms ease;
+    }
+    .back-btn:hover { color: var(--ink); }
+    .back-arrow { font-size: 17px; }
+
+    /* States */
+    .loading-container { display: flex; justify-content: center; padding: 64px 0; }
+    .spinner {
+      display: inline-block;
+      width: 44px; height: 44px;
+      border: 3px solid color-mix(in oklch, var(--accent) 30%, transparent);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     .error-state {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
       padding: 64px 16px;
-      color: rgba(0,0,0,0.45);
+      color: var(--ink-muted);
       text-align: center;
     }
-    .error-state mat-icon {
-      font-size: 64px;
-      width: 64px;
-      height: 64px;
-    }
+    .error-icon { font-size: 48px; }
+
     /* Header */
     .user-header {
       display: flex;
       align-items: flex-start;
       gap: 20px;
-      margin-bottom: 24px;
       padding: 24px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
     }
     .user-avatar {
       flex-shrink: 0;
-      width: 72px;
-      height: 72px;
+      width: 72px; height: 72px;
       border-radius: 50%;
-      background: #6750a4;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: color-mix(in oklch, var(--accent) 25%, var(--surface-2));
+      display: flex; align-items: center; justify-content: center;
       overflow: hidden;
     }
     .avatar-img { width: 100%; height: 100%; object-fit: cover; }
-    .avatar-initials { color: white; font-size: 26px; font-weight: 700; }
+    .avatar-initials { color: var(--accent); font-size: 26px; font-weight: 700; }
     .user-info { flex: 1; min-width: 0; }
-    .user-name { font-size: 1.4rem; font-weight: 700; margin: 0 0 2px; }
+    .user-name { font-size: 1.4rem; font-weight: 700; color: var(--ink); margin: 0 0 2px; }
     .user-since {
       font-size: 13px;
-      color: rgba(0,0,0,0.5);
+      color: var(--ink-muted);
       margin: 0 0 14px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
     }
     .fiabilidad-row {
       display: flex;
@@ -94,21 +97,18 @@ const NIVEL_LABELS = ['', 'Principiante', 'Amateur', 'Intermedio', 'Avanzado', '
       gap: 8px;
       flex-wrap: wrap;
     }
-    .fiabilidad-label { font-size: 13px; color: rgba(0,0,0,0.6); }
+    .fiabilidad-label { font-size: 13px; color: var(--ink-muted); }
     .fiabilidad-score {
-      font-size: 14px;
-      font-weight: 700;
+      font-size: 14px; font-weight: 700;
       min-width: 44px;
     }
-    .score-green { color: #166534; }
-    .score-amber { color: #9a3412; }
-    .score-red   { color: #991b1b; }
+    .score-green { color: oklch(0.60 0.16 145); }
+    .score-amber { color: oklch(0.60 0.13 75); }
+    .score-red   { color: var(--danger); }
     .score-bar-track {
-      flex: 1;
-      min-width: 100px;
-      max-width: 160px;
+      flex: 1; min-width: 100px; max-width: 160px;
       height: 8px;
-      background: rgba(0,0,0,0.1);
+      background: var(--bg-2);
       border-radius: 4px;
       overflow: hidden;
     }
@@ -117,35 +117,43 @@ const NIVEL_LABELS = ['', 'Principiante', 'Amateur', 'Intermedio', 'Avanzado', '
       border-radius: 4px;
       transition: width 0.4s ease;
     }
-    .score-bar-fill.score-green { background: #22c55e; }
-    .score-bar-fill.score-amber { background: #f97316; }
-    .score-bar-fill.score-red   { background: #ef4444; }
-    /* Sports */
+    .score-bar-fill.score-green { background: oklch(0.73 0.17 145); }
+    .score-bar-fill.score-amber { background: oklch(0.78 0.15 75); }
+    .score-bar-fill.score-red   { background: var(--danger); }
+
+    /* Sports card */
+    .sports-card {
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+    }
     .section-title {
-      font-size: 1rem;
-      font-weight: 600;
-      margin: 0 0 12px;
+      font-size: 1rem; font-weight: 700;
+      color: var(--ink);
+      margin: 0 0 16px;
     }
     .sports-list { display: flex; flex-direction: column; }
     .sport-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 4px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--hairline);
     }
+    .sport-row:last-child { border-bottom: none; }
     .sport-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .sport-name { font-weight: 600; font-size: 15px; }
-    .sport-stars { font-size: 15px; letter-spacing: 1px; color: #f59e0b; }
-    .sport-level { font-size: 13px; color: rgba(0,0,0,0.55); }
-    .sport-role  { font-size: 13px; color: rgba(0,0,0,0.45); font-style: italic; }
+    .sport-name { font-weight: 600; font-size: 15px; color: var(--ink); }
+    .sport-stars { font-size: 15px; letter-spacing: 1px; color: oklch(0.78 0.15 75); }
+    .sport-level { font-size: 13px; color: var(--ink-muted); }
+    .sport-role  { font-size: 13px; color: var(--ink-muted); font-style: italic; }
     .empty-sports {
       padding: 32px 0;
       text-align: center;
-      color: rgba(0,0,0,0.45);
+      color: var(--ink-muted);
       font-size: 14px;
     }
-    /* Back button */
-    .back-btn { margin-bottom: 16px; }
+
     @media (max-width: 600px) {
       .profile-page { padding: 12px; }
       .user-header { flex-direction: column; align-items: center; text-align: center; padding: 16px; }
@@ -153,20 +161,20 @@ const NIVEL_LABELS = ['', 'Principiante', 'Amateur', 'Intermedio', 'Avanzado', '
   `],
   template: `
     <div class="profile-page">
-      <button mat-button class="back-btn" (click)="goBack()">
-        <mat-icon>arrow_back</mat-icon>
+      <button class="back-btn" (click)="goBack()">
+        <span class="back-arrow">←</span>
         Volver
       </button>
 
       @if (loading()) {
         <div class="loading-container">
-          <mat-spinner diameter="48" />
+          <span class="spinner"></span>
         </div>
       } @else if (error()) {
         <div class="error-state">
-          <mat-icon>person_off</mat-icon>
+          <span class="error-icon">👤</span>
           <p>Usuario no encontrado</p>
-          <button mat-stroked-button (click)="goBack()">Volver</button>
+          <button class="back-btn" (click)="goBack()">Volver</button>
         </div>
       } @else if (user()) {
         <!-- User header -->
@@ -181,7 +189,6 @@ const NIVEL_LABELS = ['', 'Principiante', 'Amateur', 'Intermedio', 'Avanzado', '
           <div class="user-info">
             <h1 class="user-name">{{ user()!.nombre }}</h1>
             <p class="user-since">
-              <mat-icon style="font-size:14px;width:14px;height:14px">calendar_today</mat-icon>
               Miembro desde {{ user()!.fechaRegistro | date:'MMMM yyyy':'':'es-ES' }}
             </p>
             <div class="fiabilidad-row">
@@ -190,8 +197,10 @@ const NIVEL_LABELS = ['', 'Principiante', 'Amateur', 'Intermedio', 'Avanzado', '
                 {{ user()!.fiabilidadScore | number:'1.0-0' }}%
               </span>
               <div class="score-bar-track">
-                <div class="score-bar-fill" [class]="scoreClass()"
-                     [style.width.%]="user()!.fiabilidadScore">
+                <div
+                  class="score-bar-fill"
+                  [class]="scoreClass()"
+                  [style.width.%]="user()!.fiabilidadScore">
                 </div>
               </div>
             </div>
@@ -199,30 +208,27 @@ const NIVEL_LABELS = ['', 'Principiante', 'Amateur', 'Intermedio', 'Avanzado', '
         </div>
 
         <!-- Sports -->
-        <mat-card>
-          <mat-card-content style="padding: 20px">
-            <h2 class="section-title">Deportes</h2>
-            @if (user()!.deportes.length === 0) {
-              <p class="empty-sports">Este usuario no tiene deportes registrados</p>
-            } @else {
-              <div class="sports-list">
-                @for (s of user()!.deportes; track s.idDeporte; let last = $last) {
-                  <div class="sport-row">
-                    <div class="sport-info">
-                      <span class="sport-name">{{ s.nombreDeporte }}</span>
-                      <span class="sport-stars">{{ nivelStars(s.nivel) }}</span>
-                      <span class="sport-level">{{ nivelLabel(s.nivel) }}</span>
-                      @if (s.rolPreferido) {
-                        <span class="sport-role">· {{ s.rolPreferido }}</span>
-                      }
-                    </div>
+        <div class="sports-card">
+          <h2 class="section-title">Deportes</h2>
+          @if (user()!.deportes.length === 0) {
+            <p class="empty-sports">Este usuario no tiene deportes registrados</p>
+          } @else {
+            <div class="sports-list">
+              @for (s of user()!.deportes; track s.idDeporte) {
+                <div class="sport-row">
+                  <div class="sport-info">
+                    <span class="sport-name">{{ s.nombreDeporte }}</span>
+                    <span class="sport-stars">{{ nivelStars(s.nivel) }}</span>
+                    <span class="sport-level">{{ nivelLabel(s.nivel) }}</span>
+                    @if (s.rolPreferido) {
+                      <span class="sport-role">· {{ s.rolPreferido }}</span>
+                    }
                   </div>
-                  @if (!last) { <mat-divider /> }
-                }
-              </div>
-            }
-          </mat-card-content>
-        </mat-card>
+                </div>
+              }
+            </div>
+          }
+        </div>
       }
     </div>
   `,
@@ -231,11 +237,11 @@ export class UserProfileComponent implements OnChanges {
   @Input() id!: string;
 
   private readonly userSvc = inject(UserService);
-  private readonly router = inject(Router);
+  private readonly router  = inject(Router);
 
   readonly loading = signal(false);
-  readonly error = signal(false);
-  readonly user = signal<UsuarioPublicResponse | null>(null);
+  readonly error   = signal(false);
+  readonly user    = signal<UsuarioPublicResponse | null>(null);
 
   ngOnChanges(): void {
     const numId = parseInt(this.id, 10);
@@ -243,7 +249,7 @@ export class UserProfileComponent implements OnChanges {
     this.loading.set(true);
     this.error.set(false);
     this.userSvc.getPublicProfile(numId).subscribe({
-      next: u => { this.user.set(u); this.loading.set(false); },
+      next:  u => { this.user.set(u); this.loading.set(false); },
       error: () => { this.error.set(true); this.loading.set(false); },
     });
   }

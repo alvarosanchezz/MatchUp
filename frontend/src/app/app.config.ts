@@ -3,6 +3,7 @@ import {
   provideZoneChangeDetection,
   APP_INITIALIZER,
   LOCALE_ID,
+  importProvidersFrom,
 } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -16,6 +17,16 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { refreshInterceptor } from './core/interceptors/refresh.interceptor';
 import { AuthService } from './core/services/auth.service';
 import { TokenService } from './core/services/token.service';
+import {
+  LucideAngularModule,
+  Activity, ArrowLeft, ArrowRight, Bike, Bookmark, BarChart3, Bell,
+  Calendar, CalendarCheck, Check, CheckCircle2, ChevronDown, ChevronRight,
+  Circle, CircleDashed, Clock, Compass, Eye, EyeOff, Flag, Flame, Footprints,
+  Globe, Goal, Info, Key, Layers, Lock, LogIn, LogOut, Mail, Map, MapPin,
+  Megaphone, Menu, MessageCircle, Navigation, Pencil, Plus, PlusCircle,
+  Radar, Search, Send, Settings, Share2, Sliders, Star, Trash2, Trophy,
+  User, UserPlus, Users, Volleyball, Waves, X, Zap,
+} from 'lucide-angular';
 
 // Registrar datos del locale español una sola vez al arrancar
 registerLocaleData(localeEs);
@@ -51,5 +62,16 @@ export const appConfig: ApplicationConfig = {
       deps: [AuthService, TokenService],
       multi: true,
     },
+
+    // ── Lucide icons — registro global de iconos usados en la app ────────
+    importProvidersFrom(LucideAngularModule.pick({
+      Activity, ArrowLeft, ArrowRight, Bike, Bookmark, BarChart3, Bell,
+      Calendar, CalendarCheck, Check, CheckCircle2, ChevronDown, ChevronRight,
+      Circle, CircleDashed, Clock, Compass, Eye, EyeOff, Flag, Flame, Footprints,
+      Globe, Goal, Info, Key, Layers, Lock, LogIn, LogOut, Mail, Map, MapPin,
+      Megaphone, Menu, MessageCircle, Navigation, Pencil, Plus, PlusCircle,
+      Radar, Search, Send, Settings, Share2, Sliders, Star, Trash2, Trophy,
+      User, UserPlus, Users, Volleyball, Waves, X, Zap,
+    })),
   ],
 };

@@ -2,8 +2,8 @@
 
   <!-- ── Cabecera ── -->
   <div class="page-header">
-    <a mat-button routerLink="/meetups" class="back-btn">
-      <mat-icon>arrow_back</mat-icon>
+    <a routerLink="/meetups" class="back-btn">
+      <lucide-icon name="arrow-left" [size]="16"></lucide-icon>
       Volver
     </a>
     <h1 class="page-title">
@@ -13,25 +13,22 @@
 
   @if (loadingData()) {
     <div class="loading-container">
-      <mat-spinner diameter="48" />
+      <span class="spinner spinner-lg"></span>
     </div>
   } @else {
 
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
 
       <!-- ── Card 1: Datos básicos ── -->
-      <mat-card class="form-card">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon class="card-title-icon">sports</mat-icon>
-            Datos de la quedada
-          </mat-card-title>
-        </mat-card-header>
-
-        <mat-card-content>
+      <div class="form-card">
+        <div class="form-card-header">
+          <lucide-icon name="trophy" [size]="18" class="card-icon"></lucide-icon>
+          <h2>Datos de la quedada</h2>
+        </div>
+        <div class="form-card-body">
 
           <!-- Deporte -->
-          <mat-form-field class="full-width">
+          <mat-form-field appearance="outline" class="full-width">
             <mat-label>Deporte *</mat-label>
             <mat-select formControlName="idDeporte" (selectionChange)="onSportChange($event.value)">
               @for (sport of sports(); track sport.id) {
@@ -45,61 +42,49 @@
 
           <!-- Fechas y horas -->
           <div class="datetime-row">
-            <mat-form-field>
+            <mat-form-field appearance="outline">
               <mat-label>Fecha inicio *</mat-label>
               <input matInput [matDatepicker]="pickerInicio" formControlName="fechaInicio" />
               <mat-datepicker-toggle matIconSuffix [for]="pickerInicio" />
               <mat-datepicker #pickerInicio />
-              @if (fieldError('fechaInicio', 'required')) {
-                <mat-error>Requerido</mat-error>
-              }
+              @if (fieldError('fechaInicio', 'required')) { <mat-error>Requerido</mat-error> }
             </mat-form-field>
 
-            <mat-form-field>
+            <mat-form-field appearance="outline">
               <mat-label>Hora inicio *</mat-label>
               <input matInput type="time" formControlName="horaInicio" />
-              @if (fieldError('horaInicio', 'required')) {
-                <mat-error>Requerido</mat-error>
-              }
+              @if (fieldError('horaInicio', 'required')) { <mat-error>Requerido</mat-error> }
             </mat-form-field>
 
-            <mat-form-field>
+            <mat-form-field appearance="outline">
               <mat-label>Fecha fin *</mat-label>
               <input matInput [matDatepicker]="pickerFin" formControlName="fechaFin" />
               <mat-datepicker-toggle matIconSuffix [for]="pickerFin" />
               <mat-datepicker #pickerFin />
-              @if (fieldError('fechaFin', 'required')) {
-                <mat-error>Requerido</mat-error>
-              }
+              @if (fieldError('fechaFin', 'required')) { <mat-error>Requerido</mat-error> }
             </mat-form-field>
 
-            <mat-form-field>
+            <mat-form-field appearance="outline">
               <mat-label>Hora fin *</mat-label>
               <input matInput type="time" formControlName="horaFin" />
-              @if (fieldError('horaFin', 'required')) {
-                <mat-error>Requerido</mat-error>
-              }
+              @if (fieldError('horaFin', 'required')) { <mat-error>Requerido</mat-error> }
             </mat-form-field>
           </div>
 
           @if (fechaFinAnterior && (formSubmitted() || form.get('horaFin')?.touched)) {
             <p class="form-error-msg">
-              <mat-icon>error_outline</mat-icon>
+              <lucide-icon name="info" [size]="15"></lucide-icon>
               La fecha/hora de fin debe ser posterior a la de inicio
             </p>
           }
 
           <!-- Número de jugadores -->
-          <mat-form-field class="half-width">
+          <mat-form-field appearance="outline" class="half-width">
             <mat-label>Número de jugadores *</mat-label>
             <input matInput type="number" formControlName="numJugadoresTotal" min="1" />
             <mat-hint>Mínimo 1</mat-hint>
-            @if (fieldError('numJugadoresTotal', 'required')) {
-              <mat-error>Requerido</mat-error>
-            }
-            @if (fieldError('numJugadoresTotal', 'min')) {
-              <mat-error>Mínimo 1 jugador</mat-error>
-            }
+            @if (fieldError('numJugadoresTotal', 'required')) { <mat-error>Requerido</mat-error> }
+            @if (fieldError('numJugadoresTotal', 'min')) { <mat-error>Mínimo 1 jugador</mat-error> }
           </mat-form-field>
 
           <!-- Pública / Privada -->
@@ -108,49 +93,37 @@
               Quedada pública
             </mat-slide-toggle>
             <span class="toggle-hint">
-              {{ form.get('esPublica')?.value
-                  ? 'Visible para todos los usuarios'
-                  : 'Solo visible por invitación' }}
+              {{ form.get('esPublica')?.value ? 'Visible para todos los usuarios' : 'Solo visible por invitación' }}
             </span>
           </div>
 
           <!-- Descripción -->
-          <mat-form-field class="full-width">
+          <mat-form-field appearance="outline" class="full-width">
             <mat-label>Descripción (opcional)</mat-label>
-            <textarea
-              matInput
-              formControlName="descripcion"
-              rows="4"
-              maxlength="2000">
-            </textarea>
-            <mat-hint align="end">
-              {{ form.get('descripcion')?.value?.length ?? 0 }}/2000
-            </mat-hint>
+            <textarea matInput formControlName="descripcion" rows="4" maxlength="2000"></textarea>
+            <mat-hint align="end">{{ form.get('descripcion')?.value?.length ?? 0 }}/2000</mat-hint>
           </mat-form-field>
 
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
       <!-- ── Card 2: Ubicación ── -->
-      <mat-card class="form-card">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon class="card-title-icon">place</mat-icon>
-            Ubicación
-          </mat-card-title>
-        </mat-card-header>
-
-        <mat-card-content>
+      <div class="form-card">
+        <div class="form-card-header">
+          <lucide-icon name="map-pin" [size]="18" class="card-icon"></lucide-icon>
+          <h2>Ubicación</h2>
+        </div>
+        <div class="form-card-body">
 
           <!-- Búsqueda Nominatim -->
-          <mat-form-field class="full-width">
+          <mat-form-field appearance="outline" class="full-width">
             <mat-label>Buscar dirección</mat-label>
             <input
               matInput
               [formControl]="searchCtrl"
               [matAutocomplete]="nominatimAuto"
               placeholder="Ej: Polideportivo Manresa, Madrid…" />
-            <mat-icon matSuffix>search</mat-icon>
+            <lucide-icon matSuffix name="search" [size]="16" class="field-suffix-icon"></lucide-icon>
             <mat-hint>Escribe para buscar y selecciona un resultado</mat-hint>
             <mat-autocomplete
               #nominatimAuto
@@ -164,8 +137,8 @@
 
           <!-- Instrucción -->
           <p class="map-instruction">
-            <mat-icon class="inline-icon">touch_app</mat-icon>
-            También puedes hacer clic en el mapa para colocar el marcador. Arrastra el marcador para ajustar la posición.
+            <lucide-icon name="map-pin" [size]="14"></lucide-icon>
+            Haz clic en el mapa para colocar el marcador. Arrastra el marcador para ajustar la posición.
           </p>
 
           <!-- Mapa interactivo -->
@@ -173,20 +146,20 @@
 
           @if (!locationSet() && formSubmitted()) {
             <p class="form-error-msg">
-              <mat-icon>error_outline</mat-icon>
+              <lucide-icon name="info" [size]="15"></lucide-icon>
               Selecciona una ubicación en el mapa o buscando una dirección
             </p>
           }
 
           @if (locationSet()) {
             <p class="coords-display">
-              <mat-icon class="inline-icon">gps_fixed</mat-icon>
+              <lucide-icon name="navigation" [size]="13"></lucide-icon>
               {{ coordsDisplay() }}
             </p>
           }
 
           <!-- Nombre de la ubicación -->
-          <mat-form-field class="full-width">
+          <mat-form-field appearance="outline" class="full-width">
             <mat-label>Nombre del lugar *</mat-label>
             <input
               matInput
@@ -201,21 +174,17 @@
             }
           </mat-form-field>
 
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
       <!-- ── Acciones ── -->
       <div class="form-actions">
-        <a mat-stroked-button routerLink="/meetups">Cancelar</a>
-        <button
-          mat-raised-button
-          color="primary"
-          type="submit"
-          [disabled]="submitting()">
+        <a routerLink="/meetups" class="btn-ghost">Cancelar</a>
+        <button type="submit" class="btn-primary" [disabled]="submitting()">
           @if (submitting()) {
-            <mat-spinner diameter="20" class="btn-spinner" />
+            <span class="btn-spin"></span>
           } @else {
-            <mat-icon>{{ isEditMode ? 'save' : 'add_circle' }}</mat-icon>
+            <lucide-icon [name]="isEditMode ? 'check' : 'plus-circle'" [size]="16"></lucide-icon>
           }
           {{ isEditMode ? 'Guardar cambios' : 'Crear quedada' }}
         </button>

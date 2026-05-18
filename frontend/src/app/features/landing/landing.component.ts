@@ -1,18 +1,16 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { LucideAngularModule } from 'lucide-angular';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [RouterLink, MatButtonModule, MatIconModule],
+  imports: [RouterLink, LucideAngularModule],
   styles: [`
-    /* ── Reset & base ──────────────────────────────────────────────────────── */
     :host { display: block; }
 
-    /* ── Navbar ────────────────────────────────────────────────────────────── */
+    /* ── Navbar ─────────────────────────────────────────────────────────── */
     .nav {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -22,34 +20,71 @@ import { AuthService } from '../../core/services/auth.service';
       justify-content: space-between;
       padding: 0 40px;
       height: 64px;
-      background: rgba(15, 12, 41, 0.75);
+      background: color-mix(in oklch, var(--bg) 82%, transparent);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.07);
+      border-bottom: 1px solid var(--hairline);
     }
     .nav-logo {
       display: flex;
       align-items: center;
       gap: 10px;
-      color: white;
       text-decoration: none;
     }
-    .nav-logo-icon {
+    .nav-logo-mark {
       width: 36px; height: 36px;
-      background: linear-gradient(135deg, #a78bfa, #7c3aed);
+      background: var(--accent);
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--accent-ink);
+      flex-shrink: 0;
     }
-    .nav-logo-icon mat-icon { color: white; font-size: 20px; width: 20px; height: 20px; }
-    .nav-logo-text { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+    .nav-logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+    }
+    .nav-logo-text b { color: var(--accent); }
     .nav-actions { display: flex; gap: 8px; align-items: center; }
-    .nav-login { color: rgba(255,255,255,0.85) !important; }
-    .nav-register { background: white !important; color: #5b21b6 !important; font-weight: 600 !important; }
 
-    /* ── Hero ──────────────────────────────────────────────────────────────── */
+    .btn-nav-ghost {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: color-mix(in oklch, var(--ink) 75%, transparent);
+      text-decoration: none;
+      background: transparent;
+      border: 1px solid transparent;
+      transition: background 150ms, color 150ms;
+      &:hover { background: var(--surface); color: var(--ink); }
+    }
+    .btn-nav-accent {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent-ink);
+      text-decoration: none;
+      background: var(--accent);
+      border: none;
+      transition: filter 150ms, transform 120ms;
+      &:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    }
+
+    /* ── Hero ───────────────────────────────────────────────────────────── */
     .hero {
       min-height: 100vh;
-      background: linear-gradient(135deg, #0f0c29 0%, #302b63 55%, #24243e 100%);
+      background: var(--bg);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -59,104 +94,121 @@ import { AuthService } from '../../core/services/auth.service';
       position: relative;
       overflow: hidden;
     }
-
-    /* Decorative blobs */
     .hero::before {
       content: '';
       position: absolute;
-      top: 10%; left: -10%;
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(124,61,255,0.22) 0%, transparent 70%);
+      top: 5%; left: -15%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, color-mix(in oklch, var(--accent) 18%, transparent) 0%, transparent 65%);
       pointer-events: none;
     }
     .hero::after {
       content: '';
       position: absolute;
-      bottom: 5%; right: -5%;
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(167,139,250,0.18) 0%, transparent 70%);
+      bottom: 0; right: -10%;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, color-mix(in oklch, var(--accent) 10%, transparent) 0%, transparent 65%);
       pointer-events: none;
     }
 
     .hero-badge {
+      position: relative;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(167,139,250,0.15);
-      border: 1px solid rgba(167,139,250,0.35);
-      border-radius: 20px;
+      background: color-mix(in oklch, var(--accent) 14%, transparent);
+      border: 1px solid color-mix(in oklch, var(--accent) 35%, transparent);
+      border-radius: 999px;
       padding: 6px 16px;
       font-size: 13px;
-      color: #c4b5fd;
-      font-weight: 500;
+      color: var(--accent);
+      font-weight: 600;
       margin-bottom: 28px;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.2px;
     }
-    .hero-badge mat-icon { font-size: 15px; width: 15px; height: 15px; }
+    .hero-badge lucide-icon { width: 14px; height: 14px; }
 
     .hero-title {
+      position: relative;
+      font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(2.4rem, 6vw, 4rem);
       font-weight: 800;
-      color: white;
-      line-height: 1.12;
-      letter-spacing: -1px;
+      color: var(--ink);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
       margin: 0 0 20px;
-      max-width: 700px;
-
-      span {
-        background: linear-gradient(90deg, #a78bfa, #60a5fa);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
+      max-width: 720px;
+    }
+    .hero-title .highlight {
+      color: var(--accent);
     }
 
     .hero-sub {
+      position: relative;
       font-size: clamp(1rem, 2.5vw, 1.2rem);
-      color: rgba(255,255,255,0.62);
+      color: color-mix(in oklch, var(--ink) 55%, transparent);
       max-width: 520px;
       line-height: 1.65;
       margin: 0 0 40px;
     }
 
     .hero-cta {
+      position: relative;
       display: flex;
       gap: 16px;
       flex-wrap: wrap;
       justify-content: center;
       margin-bottom: 56px;
     }
-    .btn-primary-hero {
-      background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
-      color: white !important;
-      font-size: 16px !important;
-      font-weight: 600 !important;
-      padding: 0 32px !important;
-      height: 52px !important;
-      border-radius: 26px !important;
-      box-shadow: 0 8px 24px rgba(124,58,237,0.45) !important;
-      transition: box-shadow 0.2s, transform 0.15s !important;
-
+    .btn-hero-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 14px 32px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 8px 28px color-mix(in oklch, var(--accent) 38%, transparent);
+      transition: filter 0.2s, transform 0.15s, box-shadow 0.2s;
+      lucide-icon { width: 18px; height: 18px; }
       &:hover {
-        box-shadow: 0 12px 32px rgba(124,58,237,0.6) !important;
-        transform: translateY(-1px);
+        filter: brightness(1.08);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 36px color-mix(in oklch, var(--accent) 50%, transparent);
       }
     }
-    .btn-secondary-hero {
-      color: rgba(255,255,255,0.8) !important;
-      border-color: rgba(255,255,255,0.25) !important;
-      font-size: 16px !important;
-      padding: 0 32px !important;
-      height: 52px !important;
-      border-radius: 26px !important;
-
-      &:hover { background: rgba(255,255,255,0.06) !important; }
+    .btn-hero-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: color-mix(in oklch, var(--ink) 75%, transparent);
+      border: 1px solid color-mix(in oklch, var(--ink) 22%, transparent);
+      font-size: 16px;
+      font-weight: 600;
+      padding: 14px 32px;
+      border-radius: 999px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      &:hover {
+        background: color-mix(in oklch, var(--ink) 6%, transparent);
+        border-color: color-mix(in oklch, var(--ink) 32%, transparent);
+        color: var(--ink);
+      }
     }
 
     /* Stat pills */
     .hero-stats {
+      position: relative;
       display: flex;
-      gap: 24px;
+      gap: 28px;
       flex-wrap: wrap;
       justify-content: center;
     }
@@ -164,37 +216,40 @@ import { AuthService } from '../../core/services/auth.service';
       display: flex;
       align-items: center;
       gap: 8px;
-      color: rgba(255,255,255,0.55);
+      color: color-mix(in oklch, var(--ink) 50%, transparent);
       font-size: 14px;
+      font-weight: 500;
     }
-    .stat-pill mat-icon { font-size: 18px; width: 18px; height: 18px; color: #a78bfa; }
+    .stat-pill lucide-icon { width: 17px; height: 17px; color: var(--accent); }
 
-    /* ── Features ──────────────────────────────────────────────────────────── */
+    /* ── Features ───────────────────────────────────────────────────────── */
     .features {
-      background: #fafafa;
-      padding: 80px 24px;
+      background: var(--surface);
+      padding: 96px 24px;
+      border-top: 1px solid var(--hairline);
     }
     .section-label {
       text-align: center;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 2px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: #7c3aed;
-      margin-bottom: 12px;
+      color: var(--accent);
+      margin-bottom: 10px;
     }
     .section-title {
       text-align: center;
+      font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(1.6rem, 4vw, 2.4rem);
       font-weight: 700;
-      color: #1a1a2e;
+      color: var(--ink);
       margin: 0 0 12px;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.03em;
     }
     .section-sub {
       text-align: center;
       font-size: 16px;
-      color: rgba(0,0,0,0.5);
+      color: color-mix(in oklch, var(--ink) 55%, transparent);
       max-width: 500px;
       margin: 0 auto 56px;
       line-height: 1.65;
@@ -202,74 +257,86 @@ import { AuthService } from '../../core/services/auth.service';
 
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
       max-width: 960px;
       margin: 0 auto;
     }
     .feature-card {
-      background: white;
+      background: var(--bg);
+      border: 1px solid var(--hairline);
       border-radius: 16px;
-      padding: 32px 28px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
-      transition: box-shadow 0.2s, transform 0.2s;
-
+      padding: 28px 24px;
+      transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
       &:hover {
-        box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+        box-shadow: 0 8px 32px color-mix(in oklch, var(--accent) 12%, transparent);
         transform: translateY(-3px);
+        border-color: color-mix(in oklch, var(--accent) 30%, transparent);
       }
     }
     .feature-icon {
-      width: 52px; height: 52px;
+      width: 50px; height: 50px;
       border-radius: 14px;
+      background: color-mix(in oklch, var(--accent) 14%, transparent);
       display: flex; align-items: center; justify-content: center;
       margin-bottom: 18px;
     }
-    .feature-icon mat-icon { font-size: 26px; width: 26px; height: 26px; }
-    .icon-purple { background: rgba(124,58,237,0.1); }
-    .icon-purple mat-icon { color: #7c3aed; }
-    .icon-blue   { background: rgba(59,130,246,0.1); }
-    .icon-blue mat-icon   { color: #3b82f6; }
-    .icon-green  { background: rgba(16,185,129,0.1); }
-    .icon-green mat-icon  { color: #10b981; }
-    .icon-orange { background: rgba(249,115,22,0.1); }
-    .icon-orange mat-icon { color: #f97316; }
-
+    .feature-icon lucide-icon {
+      width: 24px; height: 24px;
+      color: var(--accent);
+    }
     .feature-title {
+      font-family: 'Space Grotesk', sans-serif;
       font-size: 17px;
       font-weight: 700;
-      color: #1a1a2e;
+      color: var(--ink);
       margin: 0 0 8px;
     }
     .feature-text {
       font-size: 14px;
-      color: rgba(0,0,0,0.55);
+      color: color-mix(in oklch, var(--ink) 55%, transparent);
       line-height: 1.65;
       margin: 0;
     }
 
-    /* ── CTA banner ────────────────────────────────────────────────────────── */
+    /* ── CTA banner ─────────────────────────────────────────────────────── */
     .cta-banner {
-      background: linear-gradient(135deg, #0f0c29 0%, #302b63 55%, #24243e 100%);
-      padding: 80px 24px;
+      background: var(--bg);
+      padding: 96px 24px;
       text-align: center;
+      border-top: 1px solid var(--hairline);
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse, color-mix(in oklch, var(--accent) 12%, transparent) 0%, transparent 70%);
+      pointer-events: none;
     }
     .cta-banner h2 {
+      position: relative;
+      font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(1.6rem, 4vw, 2.4rem);
       font-weight: 700;
-      color: white;
+      color: var(--ink);
       margin: 0 0 12px;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.03em;
     }
     .cta-banner p {
+      position: relative;
       font-size: 16px;
-      color: rgba(255,255,255,0.55);
+      color: color-mix(in oklch, var(--ink) 55%, transparent);
       margin: 0 0 36px;
     }
 
-    /* ── Footer ────────────────────────────────────────────────────────────── */
+    /* ── Footer ─────────────────────────────────────────────────────────── */
     .footer {
-      background: #0f0c29;
+      background: var(--surface);
+      border-top: 1px solid var(--hairline);
       padding: 24px 40px;
       display: flex;
       align-items: center;
@@ -281,21 +348,22 @@ import { AuthService } from '../../core/services/auth.service';
       display: flex;
       align-items: center;
       gap: 8px;
-      color: rgba(255,255,255,0.55);
-      font-size: 14px;
+      color: color-mix(in oklch, var(--ink) 55%, transparent);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
     }
-    .footer-logo mat-icon { color: #a78bfa; font-size: 18px; width: 18px; height: 18px; }
-    .footer-copy { font-size: 13px; color: rgba(255,255,255,0.35); }
+    .footer-logo lucide-icon { color: var(--accent); width: 18px; height: 18px; }
+    .footer-copy { font-size: 13px; color: color-mix(in oklch, var(--ink) 35%, transparent); }
 
-    /* ── Mobile ────────────────────────────────────────────────────────────── */
+    /* ── Mobile ─────────────────────────────────────────────────────────── */
     @media (max-width: 600px) {
       .nav { padding: 0 16px; }
-      .nav-logo-text { font-size: 17px; }
       .hero { padding: 100px 16px 48px; }
       .hero-cta { flex-direction: column; align-items: center; }
-      .btn-primary-hero, .btn-secondary-hero { width: 100%; max-width: 280px; }
-      .features { padding: 56px 16px; }
-      .cta-banner { padding: 56px 16px; }
+      .btn-hero-primary, .btn-hero-ghost { width: 100%; max-width: 280px; justify-content: center; }
+      .features { padding: 60px 16px; }
+      .cta-banner { padding: 60px 16px; }
       .footer { padding: 20px 16px; flex-direction: column; align-items: center; text-align: center; }
     }
   `],
@@ -303,25 +371,25 @@ import { AuthService } from '../../core/services/auth.service';
     <!-- Navbar -->
     <nav class="nav">
       <a class="nav-logo" routerLink="/">
-        <div class="nav-logo-icon"><mat-icon>sports</mat-icon></div>
-        <span class="nav-logo-text">MatchUp</span>
+        <div class="nav-logo-mark">M</div>
+        <span class="nav-logo-text">match<b>up</b></span>
       </a>
       <div class="nav-actions">
-        <a mat-button class="nav-login" routerLink="/auth/login">Iniciar sesión</a>
-        <a mat-raised-button class="nav-register" routerLink="/auth/register">Regístrate</a>
+        <a class="btn-nav-ghost" routerLink="/auth/login">Iniciar sesión</a>
+        <a class="btn-nav-accent" routerLink="/auth/register">Regístrate</a>
       </div>
     </nav>
 
     <!-- Hero -->
     <section class="hero">
       <div class="hero-badge">
-        <mat-icon>bolt</mat-icon>
+        <lucide-icon name="zap"></lucide-icon>
         La plataforma de quedadas deportivas
       </div>
 
       <h1 class="hero-title">
         Encuentra tu partido,<br>
-        <span>conoce a tu gente.</span>
+        <span class="highlight">conoce a tu gente.</span>
       </h1>
 
       <p class="hero-sub">
@@ -330,26 +398,26 @@ import { AuthService } from '../../core/services/auth.service';
       </p>
 
       <div class="hero-cta">
-        <a mat-raised-button class="btn-primary-hero" routerLink="/auth/register">
+        <a class="btn-hero-primary" routerLink="/auth/register">
           Empezar gratis
-          <mat-icon style="margin-left:6px">arrow_forward</mat-icon>
+          <lucide-icon name="arrow-right"></lucide-icon>
         </a>
-        <a mat-stroked-button class="btn-secondary-hero" routerLink="/auth/login">
+        <a class="btn-hero-ghost" routerLink="/auth/login">
           Iniciar sesión
         </a>
       </div>
 
       <div class="hero-stats">
         <div class="stat-pill">
-          <mat-icon>location_on</mat-icon>
+          <lucide-icon name="map-pin"></lucide-icon>
           <span>Quedadas cerca de ti</span>
         </div>
         <div class="stat-pill">
-          <mat-icon>sports_soccer</mat-icon>
+          <lucide-icon name="trophy"></lucide-icon>
           <span>Múltiples deportes</span>
         </div>
         <div class="stat-pill">
-          <mat-icon>star</mat-icon>
+          <lucide-icon name="star"></lucide-icon>
           <span>Sistema de valoraciones</span>
         </div>
       </div>
@@ -365,8 +433,8 @@ import { AuthService } from '../../core/services/auth.service';
 
       <div class="features-grid">
         <div class="feature-card">
-          <div class="feature-icon icon-purple">
-            <mat-icon>search</mat-icon>
+          <div class="feature-icon">
+            <lucide-icon name="search"></lucide-icon>
           </div>
           <h3 class="feature-title">Busca quedadas</h3>
           <p class="feature-text">
@@ -376,8 +444,8 @@ import { AuthService } from '../../core/services/auth.service';
         </div>
 
         <div class="feature-card">
-          <div class="feature-icon icon-blue">
-            <mat-icon>group_add</mat-icon>
+          <div class="feature-icon">
+            <lucide-icon name="users"></lucide-icon>
           </div>
           <h3 class="feature-title">Únete o crea</h3>
           <p class="feature-text">
@@ -387,8 +455,8 @@ import { AuthService } from '../../core/services/auth.service';
         </div>
 
         <div class="feature-card">
-          <div class="feature-icon icon-green">
-            <mat-icon>map</mat-icon>
+          <div class="feature-icon">
+            <lucide-icon name="map"></lucide-icon>
           </div>
           <h3 class="feature-title">Mapa interactivo</h3>
           <p class="feature-text">
@@ -398,8 +466,8 @@ import { AuthService } from '../../core/services/auth.service';
         </div>
 
         <div class="feature-card">
-          <div class="feature-icon icon-orange">
-            <mat-icon>star_rate</mat-icon>
+          <div class="feature-icon">
+            <lucide-icon name="star"></lucide-icon>
           </div>
           <h3 class="feature-title">Valora y conecta</h3>
           <p class="feature-text">
@@ -414,16 +482,16 @@ import { AuthService } from '../../core/services/auth.service';
     <section class="cta-banner">
       <h2>¿Listo para jugar?</h2>
       <p>Únete gratis y empieza a encontrar tu próximo partido hoy.</p>
-      <a mat-raised-button class="btn-primary-hero" routerLink="/auth/register">
+      <a class="btn-hero-primary" routerLink="/auth/register">
         Crear cuenta gratis
-        <mat-icon style="margin-left:6px">arrow_forward</mat-icon>
+        <lucide-icon name="arrow-right"></lucide-icon>
       </a>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-logo">
-        <mat-icon>sports</mat-icon>
+        <lucide-icon name="trophy"></lucide-icon>
         <span>MatchUp</span>
       </div>
       <span class="footer-copy">© 2025 MatchUp. Hecho con ❤️ para deportistas.</span>
@@ -432,10 +500,9 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class LandingComponent implements OnInit {
   private readonly authSvc = inject(AuthService);
-  private readonly router = inject(Router);
+  private readonly router  = inject(Router);
 
   ngOnInit(): void {
-    // Si ya está autenticado, ir directo a la app
     if (this.authSvc.currentUser()) {
       this.router.navigate(['/meetups']);
     }

@@ -2,12 +2,10 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { LucideAngularModule } from 'lucide-angular';
 import { AuthService } from '../../../core/services/auth.service';
 import { ProblemDetail } from '../../../core/models/problem-detail.model';
 
@@ -17,37 +15,32 @@ import { ProblemDetail } from '../../../core/models/problem-detail.model';
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
-    MatProgressSpinnerModule,
+    LucideAngularModule,
   ],
   templateUrl: './forgot-password.component.html',
+  styleUrl: './forgot-password.component.scss',
 })
 export class ForgotPasswordComponent {
-  private readonly fb = inject(FormBuilder);
+  private readonly fb          = inject(FormBuilder);
   private readonly authService = inject(AuthService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar    = inject(MatSnackBar);
 
   loading = false;
-  sent = false;
+  sent    = false;
 
   form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
   });
 
   submit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.loading = true;
     this.authService.forgotPassword({ email: this.form.getRawValue().email! }).subscribe({
       next: () => {
         this.loading = false;
-        this.sent = true;
+        this.sent    = true;
       },
       error: (err: HttpErrorResponse) => {
         this.loading = false;

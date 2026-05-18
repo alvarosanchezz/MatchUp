@@ -1,96 +1,90 @@
 <div class="detail-page">
 
-  <!-- ── Volver ── -->
-  <a mat-button routerLink="/meetups" class="back-btn">
-    <mat-icon>arrow_back</mat-icon>
+  <!-- ── Back ───────────────────────────────────────────────────────────────── -->
+  <a routerLink="/meetups" class="back-btn">
+    <lucide-icon name="arrow-left" [size]="16"></lucide-icon>
     Volver a quedadas
   </a>
 
-  <!-- ── Spinner ── -->
+  <!-- ── Loading ────────────────────────────────────────────────────────────── -->
   @if (loading()) {
     <div class="loading-container">
-      <mat-spinner diameter="52" />
+      <span class="spinner spinner-lg"></span>
     </div>
   }
 
-  <!-- ── Contenido principal ── -->
+  <!-- ── Contenido principal ────────────────────────────────────────────────── -->
   @if (meetup(); as m) {
 
-    <!-- Header card -->
-    <mat-card class="header-card">
-      <mat-card-content>
-        <div class="header-top">
-          <div class="header-title-block">
-            <h1 class="sport-title">{{ m.nombreDeporte }}</h1>
-            <span [class]="'estado-badge badge-' + m.estado.toLowerCase()">
-              {{ estadoLabel(m.estado) }}
-            </span>
-          </div>
+    <!-- ── Header card ── -->
+    <div class="detail-card">
+      <div class="header-top">
+        <div class="header-title-block">
+          <h1 class="sport-title">{{ m.nombreDeporte }}</h1>
+          <span [class]="'estado-badge badge-' + m.estado.toLowerCase()">
+            {{ estadoLabel(m.estado) }}
+          </span>
         </div>
+      </div>
 
-        <div class="meta-grid">
-          <div class="meta-item">
-            <mat-icon>calendar_today</mat-icon>
-            <span>
-              {{ m.fechaHoraInicio | date:'dd/MM/yyyy HH:mm' }}
-              –
-              {{ m.fechaHoraFin | date:'HH:mm' }}
-            </span>
-          </div>
-          <div class="meta-item">
-            <mat-icon>place</mat-icon>
-            <span>{{ m.ubicacionNombre }}</span>
-          </div>
-          <div class="meta-item">
-            <mat-icon>group</mat-icon>
-            <span>{{ m.numParticipantesActivos }} / {{ m.numJugadoresTotal }} jugadores</span>
-          </div>
-          @if (!m.esPublica) {
-            <div class="meta-item">
-              <mat-icon>lock</mat-icon>
-              <span>Quedada privada</span>
-            </div>
-          }
+      <div class="meta-grid">
+        <div class="meta-item">
+          <lucide-icon name="calendar" [size]="16" class="meta-icon"></lucide-icon>
+          <span>{{ m.fechaHoraInicio | date:'dd/MM/yyyy HH:mm' }} – {{ m.fechaHoraFin | date:'HH:mm' }}</span>
         </div>
-
-        <div class="organizer-row">
-          <span class="meta-label">Organiza:</span>
-          <a [routerLink]="['/users', m.idOrganizador]" class="organizer-link">
-            <div class="avatar-sm">{{ initials(m.nombreOrganizador) }}</div>
-            <span>{{ m.nombreOrganizador }}</span>
-          </a>
+        <div class="meta-item">
+          <lucide-icon name="map-pin" [size]="16" class="meta-icon"></lucide-icon>
+          <span>{{ m.ubicacionNombre }}</span>
         </div>
-
-        @if (m.descripcion) {
-          <p class="description">{{ m.descripcion }}</p>
+        <div class="meta-item">
+          <lucide-icon name="users" [size]="16" class="meta-icon"></lucide-icon>
+          <span>{{ m.numParticipantesActivos }} / {{ m.numJugadoresTotal }} jugadores</span>
+        </div>
+        @if (!m.esPublica) {
+          <div class="meta-item">
+            <lucide-icon name="lock" [size]="16" class="meta-icon"></lucide-icon>
+            <span>Quedada privada</span>
+          </div>
         }
-      </mat-card-content>
-    </mat-card>
+      </div>
 
-    <!-- Mini mapa -->
-    <mat-card class="map-card">
+      <div class="organizer-row">
+        <span class="meta-label">Organiza:</span>
+        <a [routerLink]="['/users', m.idOrganizador]" class="organizer-link">
+          <div class="avatar-sm">{{ initials(m.nombreOrganizador) }}</div>
+          <span>{{ m.nombreOrganizador }}</span>
+        </a>
+      </div>
+
+      @if (m.descripcion) {
+        <p class="description">{{ m.descripcion }}</p>
+      }
+    </div>
+
+    <!-- ── Mini mapa ── -->
+    <div class="detail-card map-card-inner">
       <div #miniMap class="mini-map"></div>
-    </mat-card>
+    </div>
 
-    <!-- Acciones contextuales -->
+    <!-- ── Acciones ── -->
     @if (hasActions()) {
-      <mat-card class="actions-card">
-        <mat-card-header>
-          <mat-card-title>Acciones</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
+      <div class="detail-card">
+        <div class="card-header">
+          <h3>Acciones</h3>
+        </div>
+        <div class="card-body">
 
           <!-- Organizador: ABIERTA / COMPLETA -->
           @if (isOrganizer() && (m.estado === 'ABIERTA' || m.estado === 'COMPLETA')) {
             <div class="action-buttons">
-              <a mat-stroked-button [routerLink]="['/meetups', m.id, 'edit']">
-                <mat-icon>edit</mat-icon> Editar
+              <a [routerLink]="['/meetups', m.id, 'edit']" class="btn-ghost">
+                <lucide-icon name="pencil" [size]="15"></lucide-icon> Editar
               </a>
-              <button mat-stroked-button color="warn" (click)="cancelMeetup()" [disabled]="actionLoading()">
-                <mat-icon>cancel</mat-icon> Cancelar quedada
+              <button class="btn-danger-outline" (click)="cancelMeetup()" [disabled]="actionLoading()">
+                <lucide-icon name="x" [size]="15"></lucide-icon> Cancelar quedada
               </button>
-              <button mat-raised-button color="primary" (click)="finalizeMeetup()" [disabled]="actionLoading()">
-                <mat-icon>check_circle</mat-icon> Finalizar
+              <button class="btn-primary" (click)="finalizeMeetup()" [disabled]="actionLoading()">
+                <lucide-icon name="check-circle-2" [size]="15"></lucide-icon> Finalizar
               </button>
             </div>
           }
@@ -108,19 +102,11 @@
                         <span>{{ p.nombre }}</span>
                       </div>
                       <div class="attendance-actions">
-                        <button
-                          mat-icon-button
-                          color="primary"
-                          matTooltip="Confirmar asistencia"
-                          (click)="confirmAttendance(p.idUsuario)">
-                          <mat-icon>check_circle</mat-icon>
+                        <button class="icon-btn" matTooltip="Confirmar asistencia" (click)="confirmAttendance(p.idUsuario)">
+                          <lucide-icon name="check-circle-2" [size]="17"></lucide-icon>
                         </button>
-                        <button
-                          mat-icon-button
-                          color="warn"
-                          matTooltip="Marcar como ausente"
-                          (click)="markNoShow(p.idUsuario)">
-                          <mat-icon>cancel</mat-icon>
+                        <button class="icon-btn icon-btn-danger" matTooltip="Marcar como ausente" (click)="markNoShow(p.idUsuario)">
+                          <lucide-icon name="x" [size]="17"></lucide-icon>
                         </button>
                       </div>
                     </div>
@@ -129,7 +115,7 @@
               </div>
             } @else {
               <p class="empty-text">
-                <mat-icon class="inline-icon">check_circle</mat-icon>
+                <lucide-icon name="check-circle-2" [size]="16"></lucide-icon>
                 Todos los participantes han sido procesados
               </p>
             }
@@ -138,8 +124,8 @@
           <!-- No organizador: Apuntarme -->
           @if (canJoin()) {
             <div class="action-buttons">
-              <button mat-raised-button color="primary" (click)="joinMeetup()" [disabled]="actionLoading()">
-                <mat-icon>add_circle</mat-icon> Apuntarme
+              <button class="btn-primary" (click)="joinMeetup()" [disabled]="actionLoading()">
+                <lucide-icon name="plus-circle" [size]="16"></lucide-icon> Apuntarme
               </button>
             </div>
           }
@@ -147,8 +133,8 @@
           <!-- No organizador: Desapuntarme -->
           @if (canLeave()) {
             <div class="action-buttons">
-              <button mat-stroked-button color="warn" (click)="leaveMeetup()" [disabled]="actionLoading()">
-                <mat-icon>exit_to_app</mat-icon> Desapuntarme
+              <button class="btn-danger-outline" (click)="leaveMeetup()" [disabled]="actionLoading()">
+                <lucide-icon name="log-out" [size]="16"></lucide-icon> Desapuntarme
               </button>
             </div>
           }
@@ -156,25 +142,25 @@
           <!-- Valorar participantes -->
           @if (canRate()) {
             <div class="action-buttons">
-              <button mat-raised-button color="accent" (click)="openRateDialog()">
-                <mat-icon>star</mat-icon> Valorar participantes
+              <button class="btn-primary" (click)="openRateDialog()">
+                <lucide-icon name="star" [size]="16"></lucide-icon> Valorar participantes
               </button>
             </div>
           }
 
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
     }
 
-    <!-- Participantes -->
-    <mat-card class="participants-card">
-      <mat-card-header>
-        <mat-card-title>
+    <!-- ── Participantes ── -->
+    <div class="detail-card">
+      <div class="card-header">
+        <h3>
           Participantes
           <span class="count-chip">{{ m.numParticipantesActivos }}/{{ m.numJugadoresTotal }}</span>
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
+        </h3>
+      </div>
+      <div class="card-body">
         @if (m.participantes.length === 0) {
           <p class="empty-text">Aún no hay participantes apuntados</p>
         } @else {
@@ -197,19 +183,19 @@
             }
           </div>
         }
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
 
-    <!-- Comentarios -->
-    <mat-card class="comments-card">
-      <mat-card-header>
-        <mat-card-title>Comentarios</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
+    <!-- ── Comentarios ── -->
+    <div class="detail-card">
+      <div class="card-header">
+        <h3>Comentarios</h3>
+      </div>
+      <div class="card-body">
 
         @if (commentsLoading()) {
           <div class="comments-spinner">
-            <mat-spinner diameter="32" />
+            <span class="spinner"></span>
           </div>
         } @else if (comments().length === 0) {
           <p class="empty-text">No hay comentarios aún. ¡Sé el primero!</p>
@@ -224,20 +210,14 @@
                     <span class="comment-date">{{ c.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</span>
                   </div>
                   @if (canDeleteComment(c)) {
-                    <button
-                      mat-icon-button
-                      class="delete-btn"
-                      matTooltip="Eliminar comentario"
-                      (click)="deleteComment(c.id)">
-                      <mat-icon>delete_outline</mat-icon>
+                    <button class="icon-btn icon-btn-danger" matTooltip="Eliminar comentario" (click)="deleteComment(c.id)">
+                      <lucide-icon name="trash-2" [size]="15"></lucide-icon>
                     </button>
                   }
                 </div>
                 <p class="comment-body">{{ c.contenido }}</p>
               </div>
-              @if (!last) {
-                <mat-divider />
-              }
+              @if (!last) { <div class="divider"></div> }
             }
           </div>
         }
@@ -252,41 +232,34 @@
             hidePageSize />
         }
 
-        <!-- Formulario nuevo comentario -->
+        <!-- Nuevo comentario -->
         @if (canComment()) {
           <div class="comment-form-wrapper">
-            <mat-divider />
+            <div class="divider"></div>
             <form [formGroup]="commentForm" (ngSubmit)="submitComment()" class="comment-form">
-              <mat-form-field class="comment-field">
+              <mat-form-field appearance="outline" class="comment-field">
                 <mat-label>Escribe un comentario</mat-label>
-                <textarea
-                  matInput
-                  formControlName="contenido"
-                  rows="3"
-                  maxlength="1000">
-                </textarea>
-                <mat-hint align="end">
-                  {{ commentForm.get('contenido')?.value?.length ?? 0 }}/1000
-                </mat-hint>
+                <textarea matInput formControlName="contenido" rows="3" maxlength="1000"></textarea>
+                <mat-hint align="end">{{ commentForm.get('contenido')?.value?.length ?? 0 }}/1000</mat-hint>
                 @if (commentForm.get('contenido')?.hasError('required') && commentForm.get('contenido')?.touched) {
                   <mat-error>El comentario no puede estar vacío</mat-error>
                 }
               </mat-form-field>
-              <button
-                mat-raised-button
-                color="primary"
-                type="submit"
-                [disabled]="commentForm.invalid || commentSubmitting()">
-                <mat-icon>send</mat-icon>
+              <button type="submit" class="btn-primary" [disabled]="commentForm.invalid || commentSubmitting()">
+                @if (commentSubmitting()) {
+                  <span class="btn-spin"></span>
+                } @else {
+                  <lucide-icon name="send" [size]="15"></lucide-icon>
+                }
                 Enviar
               </button>
             </form>
           </div>
         }
 
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
 
-  } <!-- end @if (meetup()) -->
+  }<!-- end @if meetup() -->
 
 </div>

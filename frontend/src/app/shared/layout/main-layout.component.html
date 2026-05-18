@@ -1,106 +1,147 @@
-<div class="layout">
+<!-- ── App shell ─────────────────────────────────────────────────────────── -->
+<div class="app-shell">
 
-  <!-- ── Sidebar (desktop) ──────────────────────────────────────────────── -->
-  <aside class="sidebar" [class.sidebar-open]="sidenavOpen" [class.sidebar-mobile]="isMobile">
+  <!-- ── Sidebar (desktop / mobile overlay) ────────────────────────────── -->
+  <aside class="sidebar" [class.sidebar--visible]="sidenavOpen">
 
-    <!-- Brand -->
-    <div class="sidebar-brand">
-      <div class="brand-icon">
-        <mat-icon>sports</mat-icon>
-      </div>
-      <span class="brand-name">MatchUp</span>
+    <div class="brand">
+      <!-- Inline SVG logo — inverted palette of the favicon (accent bg + dark M) -->
+      <svg class="brand-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect width="32" height="32" rx="7" style="fill:var(--accent)"/>
+        <!-- Inner glow on accent bg -->
+        <rect width="32" height="32" rx="7" fill="rgba(255,255,255,0.08)"/>
+        <!-- Hexagonal badge outline (sports shield) -->
+        <path d="M16 2.5L28.5 9.25V22.75L16 29.5L3.5 22.75V9.25Z"
+              stroke="rgba(0,0,0,0.18)" stroke-width="0.85" fill="none"/>
+        <!-- M mark -->
+        <path d="M6.5 23V9L16 18L25.5 9V23"
+              style="stroke:var(--accent-ink)"
+              stroke-width="3.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"/>
+        <!-- Meetup dot -->
+        <circle cx="16" cy="18" r="2" style="fill:var(--accent-ink)" opacity="0.8"/>
+      </svg>
+      <span class="brand-name">match<b>up</b></span>
     </div>
 
-    <!-- Nav -->
-    <nav class="sidebar-nav">
+    <div class="sidebar-scroll">
       @for (item of navItems; track item.route) {
-        <a
-          class="nav-item"
-          [routerLink]="item.route"
-          routerLinkActive="nav-item-active"
-          (click)="isMobile && closeSidebar()"
-        >
-          <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
-          <span class="nav-label">{{ item.label }}</span>
+        <a class="nav-item"
+           [routerLink]="item.route"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{ exact: false }"
+           (click)="isMobile && closeSidebar()">
+          <lucide-icon [name]="item.icon"></lucide-icon>
+          <span>{{ item.label }}</span>
         </a>
       }
-    </nav>
-
-    <!-- Spacer -->
-    <div class="sidebar-spacer"></div>
-
-    <!-- User section -->
-    <div class="sidebar-user" [matMenuTriggerFor]="userMenu">
-      <div class="user-avatar">
-        @if (userPhoto) {
-          <img [src]="userPhoto" [alt]="userName" />
-        } @else {
-          <span>{{ userInitial }}</span>
-        }
-      </div>
-      <div class="user-info">
-        <span class="user-name">{{ userName }}</span>
-        <span class="user-role">Deportista</span>
-      </div>
-      <mat-icon class="user-chevron">unfold_more</mat-icon>
     </div>
 
-    <mat-menu #userMenu="matMenu" xPosition="after" yPosition="above">
-      <a mat-menu-item routerLink="/profile">
-        <mat-icon>person_outline</mat-icon>
-        <span>Mi perfil</span>
-      </a>
-      <mat-divider />
-      <button mat-menu-item (click)="logout()" class="logout-item">
-        <mat-icon>logout</mat-icon>
-        <span>Cerrar sesión</span>
+    <!-- User pill + dropdown -->
+    <div class="user-pill-wrap" (click)="$event.stopPropagation()">
+      <button class="user-pill" type="button" (click)="toggleMenu($event)">
+        <div class="avatar">{{ userInitials }}</div>
+        <div class="user-pill-info">
+          <div class="user-pill-name">{{ userName }}</div>
+          <div class="user-pill-meta">
+            <lucide-icon name="star" [size]="11"></lucide-icon>
+            <span>Deportista</span>
+          </div>
+        </div>
+        <lucide-icon name="chevron-down" class="user-chevron" [class.rotated]="showMenu"></lucide-icon>
       </button>
-    </mat-menu>
+
+      @if (showMenu) {
+        <div class="user-dropdown" (click)="$event.stopPropagation()">
+          <a class="drop-item" routerLink="/profile" (click)="showMenu = false">
+            <lucide-icon name="user"></lucide-icon>
+            Mi perfil
+          </a>
+          <div class="drop-divider"></div>
+          <button class="drop-item drop-item-danger" type="button" (click)="logout()">
+            <lucide-icon name="log-out"></lucide-icon>
+            Cerrar sesión
+          </button>
+        </div>
+      }
+    </div>
+
   </aside>
 
-  <!-- Overlay (mobile) -->
+  <!-- Overlay backdrop (mobile) -->
   @if (isMobile && sidenavOpen) {
     <div class="sidebar-overlay" (click)="closeSidebar()"></div>
   }
 
-  <!-- ── Main content ─────────────────────────────────────────────────── -->
-  <div class="content-area">
+  <!-- ── Main column ────────────────────────────────────────────────────── -->
+  <div class="main">
 
-    <!-- Mobile topbar -->
-    @if (isMobile) {
-      <header class="mobile-topbar">
-        <button class="topbar-menu-btn" (click)="toggleSidenav()" aria-label="Abrir menú">
-          <mat-icon>menu</mat-icon>
-        </button>
-        <div class="topbar-brand">
-          <div class="topbar-brand-icon"><mat-icon>sports</mat-icon></div>
-          <span>MatchUp</span>
-        </div>
-        <div class="topbar-user" [matMenuTriggerFor]="mobileUserMenu">
-          <div class="user-avatar user-avatar-sm">
-            @if (userPhoto) {
-              <img [src]="userPhoto" [alt]="userName" />
-            } @else {
-              <span>{{ userInitial }}</span>
-            }
-          </div>
-        </div>
-        <mat-menu #mobileUserMenu="matMenu">
-          <a mat-menu-item routerLink="/profile">
-            <mat-icon>person_outline</mat-icon>Mi perfil
-          </a>
-          <mat-divider />
-          <button mat-menu-item (click)="logout()">
-            <mat-icon>logout</mat-icon>Cerrar sesión
-          </button>
-        </mat-menu>
-      </header>
-    }
+    <!-- Topbar (siempre visible) -->
+    <header class="topbar">
+      <button class="mobile-menu-btn" (click)="toggleSidenav()" aria-label="Menú">
+        <lucide-icon name="menu"></lucide-icon>
+      </button>
 
-    <!-- Page -->
-    <main class="page-content">
+      <div class="search">
+        <lucide-icon name="search"></lucide-icon>
+        <input placeholder="Busca por deporte, ubicación, organizador…" aria-label="Buscar" />
+        <kbd>⌘K</kbd>
+      </div>
+
+      <div class="topbar-spacer"></div>
+
+      <button class="icon-btn" aria-label="Notificaciones">
+        <lucide-icon name="bell"></lucide-icon>
+        <span class="dot"></span>
+      </button>
+
+      <a class="cta" routerLink="/meetups/new">
+        <lucide-icon name="plus"></lucide-icon>
+        <span>Nueva quedada</span>
+      </a>
+    </header>
+
+    <!-- Page content -->
+    <main class="page-area">
       <router-outlet />
     </main>
-  </div>
 
+  </div>
 </div>
+
+<!-- ── Bottom nav (mobile only) ──────────────────────────────────────────── -->
+<nav class="bottom-nav" aria-label="Navegación">
+  <a class="bottom-nav-item"
+     routerLink="/meetups"
+     routerLinkActive="active"
+     [routerLinkActiveOptions]="{ exact: false }">
+    <lucide-icon name="compass"></lucide-icon>
+    <span>Quedadas</span>
+  </a>
+
+  <a class="bottom-nav-item"
+     routerLink="/sports"
+     routerLinkActive="active">
+    <lucide-icon name="trophy"></lucide-icon>
+    <span>Deportes</span>
+  </a>
+
+  <a class="bottom-nav-item fab"
+     routerLink="/meetups/new"
+     aria-label="Nueva quedada">
+    <lucide-icon name="plus"></lucide-icon>
+  </a>
+
+  <a class="bottom-nav-item"
+     routerLink="/profile"
+     routerLinkActive="active">
+    <lucide-icon name="user"></lucide-icon>
+    <span>Perfil</span>
+  </a>
+
+  <button class="bottom-nav-item" type="button" (click)="logout()" aria-label="Cerrar sesión">
+    <lucide-icon name="log-out"></lucide-icon>
+    <span>Salir</span>
+  </button>
+</nav>
