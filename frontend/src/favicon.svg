@@ -1,26 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
   <defs>
-    <radialGradient id="glow" cx="50%" cy="56%" r="56%">
-      <stop offset="0%"   stop-color="#a3e635" stop-opacity="0.22"/>
-      <stop offset="100%" stop-color="#a3e635" stop-opacity="0"/>
-    </radialGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#0f1923"/>
+      <stop offset="100%" stop-color="#0d1117"/>
+    </linearGradient>
+    <linearGradient id="lime" x1="6" y1="9" x2="26" y2="23" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#d9f99d"/>
+      <stop offset="100%" stop-color="#65a30d"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
 
-  <!-- Background: deep dark rounded square -->
-  <rect width="32" height="32" rx="7" fill="#0d1117"/>
+  <!-- Background pill -->
+  <rect width="32" height="32" rx="8" fill="url(#bg)"/>
 
-  <!-- Lime glow bloom -->
-  <rect width="32" height="32" rx="7" fill="url(#glow)"/>
+  <!-- Subtle border -->
+  <rect width="32" height="32" rx="8" stroke="#a3e635" stroke-width="0.6" stroke-opacity="0.18" fill="none"/>
 
-  <!-- Hexagonal badge outline — sports shield feel -->
-  <path d="M16 2.5L28.5 9.25V22.75L16 29.5L3.5 22.75V9.25Z"
-        stroke="#a3e635" stroke-width="0.85" stroke-opacity="0.28" fill="none"/>
-
-  <!-- Bold M mark -->
-  <path d="M6.5 23V9L16 18L25.5 9V23"
-        stroke="#a3e635" stroke-width="3.6"
-        stroke-linecap="round" stroke-linejoin="round"/>
-
-  <!-- Meetup dot at the valley of the M -->
-  <circle cx="16" cy="18" r="2" fill="#a3e635" opacity="0.9"/>
+  <!-- Lightning bolt — speed / competition -->
+  <path d="M19 3L9 17.5H16L13 29L23 14.5H16Z"
+        fill="url(#lime)"
+        filter="url(#glow)"
+        stroke="#a3e635" stroke-width="0.3" stroke-opacity="0.5"
+        stroke-linejoin="round"/>
 </svg>
