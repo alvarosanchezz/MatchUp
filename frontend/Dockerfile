@@ -2,6 +2,11 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 
+# Allow Node / ng build to use up to 4 GB of heap.
+# Without this Docker Desktop on Windows (default 2 GB limit) kills the process
+# mid-compile with an EOF / OOM error.
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 COPY package.json package-lock.json ./
 RUN npm ci --legacy-peer-deps
 

@@ -1,0 +1,84 @@
+# ── MatchUp · Docker Compose para VPS de clase ────────────────────────────
+# Uso en el VPS:
+#   1. Copiar este fichero y el .env al VPS (scp o git clone de la rama vps-clase)
+#   2. docker compose -f docker-compose.vps.yml pull
+#   3. docker compose -f docker-compose.vps.yml up -d
+#
+# Las imágenes se descargan de Docker Hub (alvarosanchezz/*).
+# No necesita el código fuente ni el JDK/Node en el VPS.
+
+services:
+
+  # ── Base de datos ──────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: matchup-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${DB_NAME:-matchup_db}
+      POSTGRES_USER:     ${DB_USER:-matchup_user}
+      POSTGRES_PASSWORD: ${DB_PASS:-matchup_pass_vps}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-matchup_user} -d ${DB_NAME:-matchup_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - matchup-net
+
+  # ── Backend Spring Boot ────────────────────────────────────────────────────
+  backend:
+    image: ${DOCKER_IMAGE_BACKEND:-alvarosanchezz/matchup-backend:latest}
+    container_name: matchup-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL:                 jdbc:postgresql://db:5432/${DB_NAME:-matchup_db}
+      DB_USER:                ${DB_USER:-matchup_user}
+      DB_PASS:                ${DB_PASS:-matchup_pass_vps}
+      JWT_SECRET:             ${JWT_SECRET}
+      JWT_EXPIRATION_MS:      ${JWT_EXPIRATION_MS:-900000}
+      JWT_REFRESH_MS:         ${JWT_REFRESH_MS:-604800000}
+      MAIL_HOST:              ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT:              ${MAIL_PORT:-587}
+      MAIL_USER:              ${MAIL_USER:-}
+      MAIL_PASS:              ${MAIL_PASS:-}
+      CORS_ALLOWED_ORIGINS:   ${CORS_ALLOWED_ORIGINS:-http://asanrod603d,http://localhost}
+      SERVER_PORT:            8080
+      SPRING_PROFILES_ACTIVE: prod
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/v3/api-docs"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - matchup-net
+
+  # ── Frontend Angular / nginx ───────────────────────────────────────────────
+  frontend:
+    image: ${DOCKER_IMAGE_FRONTEND:-alvarosanchezz/matchup-frontend:latest}
+    container_name: matchup-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      BACKEND_HOST: backend:8080
+    ports:
+      - "80:80"
+    networks:
+      - matchup-net
+
+volumes:
+  pgdata:
+
+networks:
+  matchup-net:
+    driver: bridge
